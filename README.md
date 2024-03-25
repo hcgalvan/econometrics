@@ -1,0 +1,2 @@
+# econometrics
+ Curso Econometria UNaM
