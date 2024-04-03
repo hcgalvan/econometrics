@@ -1,0 +1,105 @@
+---
+title: "Trabajo Practico Nro 1"
+output: html_notebook
+---
+
+#### 1. Supponga que desea estimar el siguiente modelo de regresión lineal simple
+
+Y = β0 + β1X + ε
+
+Genere dos variables aleatorias del modelo (Y, X) teniendo en cuenta que el tamaño de muestra sea de 200 y para todos los casos. Tips (elija la
+media, desvio estandar que desee. Use distribución normal ).
+
+```{r}
+## Generación de muestras X e Y
+set.seed(123)
+n <- 200 # cant observ
+mu <- 2.1 # media
+sd <- 3 # desv std
+x <- rnorm(n, mean = mu, sd=sd ) # generar con dist.normal y utilizando la mu y sd solicitado
+y <- rnorm(n ) # generar y con dist.normal con centro en 1 y 0
+dat <- cbind(x,y) #junto los valores en una lista
+
+```
+
+#### 2. Dibuje un diagrama de dispersión de las variabes simuladas. ¿Qu´e observa?.¿ Alguna relación lineal se observa?
+
+```{r}
+pairs(dat) # otra forma de verificar relación, una matriz de diagramas de dispersión
+cor(dat) # verifica correlación
+```
+
+Se observa una baja o nula relación entre las variables x e y. No se percibe un patrón lineal entre ambas variables.
+
+#### 3. Realice una regresión lineal convencional y muestre sus resultados. Interprete la significatividad individual y grupal del modelo.
+
+```{r}
+# Realizo regresión lineal 
+regresion <- lm(y ~ x, data = data.frame(dat))
+summary(regresion)
+```
+
+En modelos lineales simples, dado que solo hay un predictor, el *p-value* del test F es igual al *p-value* del *t-test* del predictor.
+
+Significatividad individual:
+
+-   La primera columna (*Estimate*) devuelve el valor estimado para los dos parámetros de la ecuación del modelo lineal (b0 y b1) que equivalen a la ordenada en el origen y la pendiente.
+
+-   Se muestran los errores estándar, el valor del estadístico *t* y el *p-value* (dos colas) de cada uno de los dos parámetros. Esto permite determinar si los parámetros son significativamente distintos de 0, es decir, que tengan importancia en el modelo. En los modelos de regresión lineal simple, el parámetro más informativo suele ser la pendiente.
+
+-   Para el modelo generado, tanto la ordenada en el origen como la pendiente son no son significativas (*p-values* \> 0.1).
+
+Significatividad Grupal del model
+
+-   El valor de r2 indica que el modelo calculado explica el -0.004% de la variabilidad presente en la variable respuesta (*y*) mediante la variable independiente (*x*).
+
+-   El *p-value* obtenido en el test F (0.697) determina que no es significativamente superior la varianza explicada por el modelo en comparación a la varianza total. Es el parámetro que determina si el modelo es significativo y por lo tanto no es aceptable.
+
+#### 4. Agregue la linea de regresión al diagrama de dispersión que grafico en el punto 1.¿ qué observa?
+
+```{r}
+library(psych)
+library(GGally)
+pairs.panels(x = data.frame(dat), ellipses = FALSE, lm = TRUE, method = "pearson")
+ggpairs(dat, lower = list(continuous = "smooth"), 
+        diag = list(continuous = "barDiag"), axisLabels = "none")
+```
+
+Se observa una linea practicamente horizontal y una dispersión de puntos que se alejan de la recta.
+
+#### 5. En caso de que no observe relación entre las variables  ¿Como podr´ıa solucionarlo? Tips (puede resolver modificando el punto 1 y repitiendo todos los puntos , 2, 3 y 4)
+
+```{r}
+
+```
+
+#### 6. En base al modelo de regresión realice una predicción para 20 datos más.
+
+```{r}
+
+```
+
+#### 7. Simule mediante Montecarlo 1000 regresiones lineales tomando de base el modelo de la ecuación (1). TIPS: en un primer paso coloque valores numéricos de los coeficientes a estimar (intercepto , y beta) además un valor para el desvío estándar del error
+
+```{r}
+
+```
+
+#### 8. Realice un histograma para las estimaciones de la pendiente y del intercepto. Indique lo que observa.
+
+```{r}
+
+```
+
+#### 9. Realice un gráfico de densidad para las estimaciones de la pendiente y del intercepto. Indique lo que observa.
+
+```{r}
+
+```
+
+#### 
+10. Repita la simulación de montecarlo pero sin que la variable X tenga una distribución normal, por ejemplo una distribución uniforme. Considere los puntos 7, 8, 9 de este TP.
+
+```{r}
+
+```
