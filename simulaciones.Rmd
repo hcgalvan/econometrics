@@ -1,0 +1,33 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+data(mtcars)
+
+```
+
+```{r}
+
+#library(dplyr)
+library(tidymodels)
+mtcars %>%
+  dplyr::select(hp) %>%
+  specify(response = hp) %>%
+  generate(reps = 10000, type = 'bootstrap') %>%
+  calculate(stat = 'mean')  -> mtcars_bootstrapped_ci_df
+mtcars_bootstrapped_ci_df
+```
+
+```{r}
+library(readr)
+#setwd("C:/hcgalvan/Repositorios/hcgalvan_project/data/union/End")
+temp = gsub(".*target.*", "", readLines("integrado.csv"))
+data<-read.table(text=temp, sep=",", header=TRUE)
+
+t<-data.frame(data[,c("sl2l_diameter","ccbd_diameter","ifol_diameter","ecpl_volume","tral_volume","sl2l_mean_length","ccbd_mean_length","label","sl2l_qa", "sl2l_iso", "ccbd_iso", "ccbd_qa", "ifol_qa", "ifol_iso", "ecpl_qa", "ecpl_iso", "tral_qa", "tral_iso", "afsl_qa", "afsl_iso", "afsr_qa", "afsr_iso", "cfpl_iso", "cfpl_qa", "cfpr_iso", "cfpr_qa", "fatl_iso", "fatl_qa", "fatr_iso", "fatr_qa", "slfl_iso", "slfl_qa", "slfr_iso", "slfr_qa", "tral_iso", "tral_qa", "ufsl_iso", "ufsl_qa", "ufsr_iso", "ufsr_qa", "age", "gender_F")])
+
+t$gend_F <- ifelse(t$gender_F == "True", 1, 0) #convierto en = o 1
+t <- subset(t, select = -c(gender_F)) # Quito de tabla 
+```
