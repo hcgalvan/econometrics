@@ -7,26 +7,35 @@ output: html_notebook
 
 Y = β0 + β1X + ε
 
-Genere dos variables aleatorias del modelo (Y, X) teniendo en cuenta que el tamaño de muestra sea de 200 y para todos los casos. Tips (elija la
-media, desvio estandar que desee. Use distribución normal ).
+Genere dos variables aleatorias del modelo (Y, X) teniendo en cuenta que el tamaño de muestra sea de 200 y para todos los casos. Tips (elija la media, desvio estandar que desee. Use distribución normal ).
 
 ```{r}
 ## Generación de muestras X e Y
 set.seed(123)
 n <- 200 # cant observ
-mu <- 2.1 # media
-sd <- 3 # desv std
-x <- rnorm(n, mean = mu, sd=sd ) # generar con dist.normal y utilizando la mu y sd solicitado
-y <- rnorm(n ) # generar y con dist.normal con centro en 1 y 0
+# Definir parámetros
+n <- 200 # cant observ
+μX <- 10 # media de x
+σX <- 2 # desv std x
+μY <- 15 # media de y
+σY <- 3 # desv std y
+
+# Generar random variables dependientes
+Z1 <- rnorm(n)
+Z2 <- rnorm(n)
+
+x <- μX + σX * Z1
+y <- μY + σY * Z2
+
 dat <- cbind(x,y) #junto los valores en una lista
 
 ```
 
-#### 2. Dibuje un diagrama de dispersión de las variabes simuladas. ¿Qu´e observa?.¿ Alguna relación lineal se observa?
+#### 2. Dibuje un diagrama de dispersión de las variabes simuladas. ¿Qué observa?.¿ Alguna relación lineal se observa?
 
 ```{r}
 pairs(dat) # otra forma de verificar relación, una matriz de diagramas de dispersión
-cor(dat) # verifica correlación
+
 ```
 
 Se observa una baja o nula relación entre las variables x e y. No se percibe un patrón lineal entre ambas variables.
@@ -60,46 +69,139 @@ Significatividad Grupal del model
 ```{r}
 library(psych)
 library(GGally)
-pairs.panels(x = data.frame(dat), ellipses = FALSE, lm = TRUE, method = "pearson")
-ggpairs(dat, lower = list(continuous = "smooth"), 
-        diag = list(continuous = "barDiag"), axisLabels = "none")
+ggpairs(dat, aes(alpha = 0.5),lower = list(continuous = "smooth"))
+#pairs.panels(x = data.frame(dat), ellipses = FALSE, lm = TRUE, method = "pearson")
+
 ```
 
-Se observa una linea practicamente horizontal y una dispersión de puntos que se alejan de la recta.
+Se observa una linea prácticamente horizontal y una dispersión de puntos que se alejan de la recta.
 
-#### 5. En caso de que no observe relación entre las variables  ¿Como podr´ıa solucionarlo? Tips (puede resolver modificando el punto 1 y repitiendo todos los puntos , 2, 3 y 4)
+#### 5. En caso de que no observe relación entre las variables ¿Como podríaa solucionarlo? Tips (puede resolver modificando el punto 1 y repitiendo todos los puntos , 2, 3 y 4)
 
 ```{r}
+set.seed(123)  # Set a seed for reproducibility
 
+# Definir parámetros
+n <- 200 # cant observ
+μX <- 10
+σX <- 2
+μY <- 15
+σY <- 3
+ρ <- 0.7 #grado de correlación
+
+# Generar random variables dependientes
+Z1 <- rnorm(n)
+Z2 <- rnorm(n)
+
+x <- μX + σX * Z1
+y <- μY + σY * (ρ * Z1 + sqrt(1 - ρ^2) * Z2)
+dat <- cbind(x,y) #junto los valores en una lista
+plot(dat)
+```
+
+```{r}
+ggpairs(dat, aes(alpha = 0.5),lower = list(continuous = "smooth"))
+```
+
+```{r}
+# Realizo regresión lineal 
+modelo <- lm(y ~ x, data = data.frame(dat))
+summary(modelo)
 ```
 
 #### 6. En base al modelo de regresión realice una predicción para 20 datos más.
 
 ```{r}
-
+Z1 <- rnorm(20)
+Z2 <- rnorm(20)
+x <- μX + σX * Z1
+y <- μY + σY * (ρ * Z1 + sqrt(1 - ρ^2) * Z2)
+nuevo <- cbind(x,y)
+predict(object=modelo, newdata=data.frame(nuevo))
 ```
 
 #### 7. Simule mediante Montecarlo 1000 regresiones lineales tomando de base el modelo de la ecuación (1). TIPS: en un primer paso coloque valores numéricos de los coeficientes a estimar (intercepto , y beta) además un valor para el desvío estándar del error
 
 ```{r}
+# Establecer numero de simulaciones
+num_simulations <- 1000
+n <- 100
+# Establecer parametros del modelo
+intercept <- 4.9
+beta <- 2
+error_std_dev <- 1
+
+# Inicializar vectores que contendrán los coeficientes estimados
+pendientes <- vector(length = num_simulations)
+intercepts <- vector(length = num_simulations)
+
+# Perform the simulations
+for (i in 1:num_simulations) {
+  # Generate the independent variable (x)
+  z1 <- rnorm(n)
+  x <- μX + σX * Z1
+  
+  # Generate the dependent variable (y) using the model equation
+  y <- intercept + beta * x + rnorm(n, 0, error_std_dev)
+  μY + σY * (ρ * Z1 + sqrt(1 - ρ^2) * Z2)
+  
+  # Fit the linear regression model
+  model <- lm(y ~ x)
+  pendientes[i] <- model$coefficients[2]
+  intercepts[i] <- model$coefficients[1]
+}
+
 
 ```
 
 #### 8. Realice un histograma para las estimaciones de la pendiente y del intercepto. Indique lo que observa.
 
 ```{r}
+par(mfrow = c(1, 2))
+hist(pendientes, main = "Distribución de Pendiente Estimadas",xlab = "Pendiente")
+hist(intercepts, main = "Distribución de Intercept Estimados", xlab = "Intercept")
 
 ```
 
 #### 9. Realice un gráfico de densidad para las estimaciones de la pendiente y del intercepto. Indique lo que observa.
 
 ```{r}
-
+par(mfrow = c(1, 2))
+plot(density(pendientes))
+plot(density(intercepts))
 ```
 
-#### 
-10. Repita la simulación de montecarlo pero sin que la variable X tenga una distribución normal, por ejemplo una distribución uniforme. Considere los puntos 7, 8, 9 de este TP.
+#### 10. Repita la simulación de montecarlo pero sin que la variable X tenga una distribución normal, por ejemplo una distribución uniforme. Considere los puntos 7, 8, 9 de este TP.
 
 ```{r}
+# Establecer numero de simulaciones
+num_simulations <- 1000
+n <- 100
+# Establecer parametros del modelo
+intercept <- 4.9
+beta <- 2
+error_std_dev <- 1
 
+# Inicializar vectores que contendrán los coeficientes estimados
+pendientes <- vector(length = num_simulations)
+intercepts <- vector(length = num_simulations)
+
+# Perform the simulations
+for (i in 1:num_simulations) {
+  # Generate the independent variable (x)
+  x <- runif(n)
+  
+  # Generate the dependent variable (y) using the model equation
+  y <- intercept + beta * x + rnorm(n, 0, error_std_dev)
+  
+  # Fit the linear regression model
+  model <- lm(y ~ x)
+  pendientes[i] <- model$coefficients[2]
+  intercepts[i] <- model$coefficients[1]
+}
+par(mfrow = c(2, 2))
+hist(pendientes, main = "Distribución de Pendiente Estimadas",xlab = "Pendiente")
+hist(intercepts, main = "Distribución de Intercept Estimados", xlab = "Intercept")
+plot(density(pendientes))
+plot(density(intercepts))
 ```
