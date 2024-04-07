@@ -1,7 +1,13 @@
 ---
-title: "Trabajo Practico Nro 1"
+title: "Trabajo Practico Nro 1 - Econometrics Curse, 2024"
 output: html_notebook
 ---
+
+## Equipo:
+
+-   Galván, Hugo César
+
+-   García, José Manuel
 
 #### 1. Supponga que desea estimar el siguiente modelo de regresión lineal simple
 
@@ -11,8 +17,7 @@ Genere dos variables aleatorias del modelo (Y, X) teniendo en cuenta que el tama
 
 ```{r}
 ## Generación de muestras X e Y
-set.seed(123)
-n <- 200 # cant observ
+set.seed(123) 
 # Definir parámetros
 n <- 200 # cant observ
 μX <- 10 # media de x
@@ -35,6 +40,7 @@ dat <- cbind(x,y) #junto los valores en una lista
 
 ```{r}
 pairs(dat) # otra forma de verificar relación, una matriz de diagramas de dispersión
+plot(dat)
 
 ```
 
@@ -44,8 +50,9 @@ Se observa una baja o nula relación entre las variables x e y. No se percibe un
 
 ```{r}
 # Realizo regresión lineal 
-regresion <- lm(y ~ x, data = data.frame(dat))
+modelo <- lm(y ~ x, data = data.frame(dat))
 summary(regresion)
+#boxplot(regresion$residuals)
 ```
 
 En modelos lineales simples, dado que solo hay un predictor, el *p-value* del test F es igual al *p-value* del *t-test* del predictor.
@@ -56,7 +63,7 @@ Significatividad individual:
 
 -   Se muestran los errores estándar, el valor del estadístico *t* y el *p-value* (dos colas) de cada uno de los dos parámetros. Esto permite determinar si los parámetros son significativamente distintos de 0, es decir, que tengan importancia en el modelo. En los modelos de regresión lineal simple, el parámetro más informativo suele ser la pendiente.
 
--   Para el modelo generado, tanto la ordenada en el origen como la pendiente son no son significativas (*p-values* \> 0.1).
+-   Para el modelo generado, la ordenada en el origen (intercept) es significativa, y la pendiente b1 no es significativa (*p-values* \> 0.1).
 
 Significatividad Grupal del model
 
@@ -64,7 +71,7 @@ Significatividad Grupal del model
 
 -   El *p-value* obtenido en el test F (0.697) determina que no es significativamente superior la varianza explicada por el modelo en comparación a la varianza total. Es el parámetro que determina si el modelo es significativo y por lo tanto no es aceptable.
 
-#### 4. Agregue la linea de regresión al diagrama de dispersión que grafico en el punto 1.¿ qué observa?
+#### 4. Agregue la linea de regresión al diagrama de dispersión que graficó en el punto 1.¿ qué observa?
 
 ```{r}
 library(psych)
@@ -94,7 +101,7 @@ Z1 <- rnorm(n)
 Z2 <- rnorm(n)
 
 x <- μX + σX * Z1
-y <- μY + σY * (ρ * Z1 + sqrt(1 - ρ^2) * Z2)
+y <- μY + σY * (ρ * x + sqrt(1 - ρ^2) * Z2)
 dat <- cbind(x,y) #junto los valores en una lista
 plot(dat)
 ```
@@ -112,12 +119,10 @@ summary(modelo)
 #### 6. En base al modelo de regresión realice una predicción para 20 datos más.
 
 ```{r}
+set.seed(123)
 Z1 <- rnorm(20)
-Z2 <- rnorm(20)
 x <- μX + σX * Z1
-y <- μY + σY * (ρ * Z1 + sqrt(1 - ρ^2) * Z2)
-nuevo <- cbind(x,y)
-predict(object=modelo, newdata=data.frame(nuevo))
+predict(object=modelo, newdata=data.frame(x))
 ```
 
 #### 7. Simule mediante Montecarlo 1000 regresiones lineales tomando de base el modelo de la ecuación (1). TIPS: en un primer paso coloque valores numéricos de los coeficientes a estimar (intercepto , y beta) además un valor para el desvío estándar del error
@@ -128,8 +133,8 @@ num_simulations <- 1000
 n <- 100
 # Establecer parametros del modelo
 intercept <- 4.9
-beta <- 2
-error_std_dev <- 1
+beta <- 1.02
+error_std_dev <- 2.138
 
 # Inicializar vectores que contendrán los coeficientes estimados
 pendientes <- vector(length = num_simulations)
@@ -138,12 +143,12 @@ intercepts <- vector(length = num_simulations)
 # Perform the simulations
 for (i in 1:num_simulations) {
   # Generate the independent variable (x)
-  z1 <- rnorm(n)
+  Z1 <- rnorm(n)
   x <- μX + σX * Z1
   
   # Generate the dependent variable (y) using the model equation
   y <- intercept + beta * x + rnorm(n, 0, error_std_dev)
-  μY + σY * (ρ * Z1 + sqrt(1 - ρ^2) * Z2)
+  #μY + σY * (ρ * Z1 + sqrt(1 - ρ^2) * Z2)
   
   # Fit the linear regression model
   model <- lm(y ~ x)
@@ -158,8 +163,8 @@ for (i in 1:num_simulations) {
 
 ```{r}
 par(mfrow = c(1, 2))
-hist(pendientes, main = "Distribución de Pendiente Estimadas",xlab = "Pendiente")
-hist(intercepts, main = "Distribución de Intercept Estimados", xlab = "Intercept")
+hist(pendientes, main = "Distribución de Pendiente",xlab = "Pendiente")
+hist(intercepts, main = "Distribución de Intercept", xlab = "Intercept")
 
 ```
 
@@ -190,6 +195,7 @@ intercepts <- vector(length = num_simulations)
 for (i in 1:num_simulations) {
   # Generate the independent variable (x)
   x <- runif(n)
+  # plot(x)
   
   # Generate the dependent variable (y) using the model equation
   y <- intercept + beta * x + rnorm(n, 0, error_std_dev)
