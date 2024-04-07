@@ -39,9 +39,13 @@ dat <- cbind(x,y) #junto los valores en una lista
 #### 2. Dibuje un diagrama de dispersión de las variabes simuladas. ¿Qué observa?.¿ Alguna relación lineal se observa?
 
 ```{r}
+library(ggplot2)
+
 pairs(dat) # otra forma de verificar relación, una matriz de diagramas de dispersión
 plot(dat)
 
+ggplot(dat, aes(x = x, y = y)) +
+  geom_point()
 ```
 
 Se observa una baja o nula relación entre las variables x e y. No se percibe un patrón lineal entre ambas variables.
@@ -50,7 +54,7 @@ Se observa una baja o nula relación entre las variables x e y. No se percibe un
 
 ```{r}
 # Realizo regresión lineal 
-modelo <- lm(y ~ x, data = data.frame(dat))
+regresion <- lm(y ~ x, data = data.frame(dat))
 summary(regresion)
 #boxplot(regresion$residuals)
 ```
@@ -79,10 +83,11 @@ library(GGally)
 ggpairs(dat, aes(alpha = 0.5),lower = list(continuous = "smooth"))
 
 # Creamos el gráfico
-plot(x, y, pch = 19, col = "lightblue")
+plot(x, y)
 # Línea de regresión
-abline(lm(y ~ x), col = "red", lwd = 3)
-#pairs.panels(x = data.frame(dat), ellipses = FALSE, lm = TRUE, method = "pearson")
+abline(lm(y ~ x))
+
+
 
 ```
 
@@ -133,6 +138,7 @@ predict(object=modelo, newdata=data.frame(x))
 #### 7. Simule mediante Montecarlo 1000 regresiones lineales tomando de base el modelo de la ecuación (1). TIPS: en un primer paso coloque valores numéricos de los coeficientes a estimar (intercepto , y beta) además un valor para el desvío estándar del error
 
 ```{r}
+set.seed(123)
 # Establecer numero de simulaciones
 num_simulations <- 1000
 n <- 100
@@ -187,6 +193,7 @@ plot(density(intercepts))
 
 ```{r}
 # Establecer numero de simulaciones
+set.seed(123)
 num_simulations <- 1000
 n <- 100
 # Establecer parametros del modelo
