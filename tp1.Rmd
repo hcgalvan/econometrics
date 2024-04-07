@@ -77,6 +77,11 @@ Significatividad Grupal del model
 library(psych)
 library(GGally)
 ggpairs(dat, aes(alpha = 0.5),lower = list(continuous = "smooth"))
+
+# Creamos el gráfico
+plot(x, y, pch = 19, col = "lightblue")
+# Línea de regresión
+abline(lm(y ~ x), col = "red", lwd = 3)
 #pairs.panels(x = data.frame(dat), ellipses = FALSE, lm = TRUE, method = "pearson")
 
 ```
@@ -164,7 +169,9 @@ for (i in 1:num_simulations) {
 ```{r}
 par(mfrow = c(1, 2))
 hist(pendientes, main = "Distribución de Pendiente",xlab = "Pendiente")
+abline(v = mean(pendientes), col="red", lwd=3, lty=2)
 hist(intercepts, main = "Distribución de Intercept", xlab = "Intercept")
+abline(v = mean(intercepts), col="red", lwd=3, lty=2)
 
 ```
 
