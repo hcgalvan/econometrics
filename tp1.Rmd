@@ -1,5 +1,5 @@
 ---
-title: "Trabajo Practico Nro 1 - Econometrics Curse, 2024"
+title: "Practical work No 1 - Econometrics Curse, 2024"
 output: html_notebook
 ---
 
@@ -39,13 +39,9 @@ dat <- cbind(x,y) #junto los valores en una lista
 #### 2. Dibuje un diagrama de dispersión de las variabes simuladas. ¿Qué observa?.¿ Alguna relación lineal se observa?
 
 ```{r}
-library(ggplot2)
-
-pairs(dat) # otra forma de verificar relación, una matriz de diagramas de dispersión
+# library(ggplot2)
+# pairs(dat) # otra forma de verificar relación, una matriz de diagramas de dispersión
 plot(dat)
-
-ggplot(dat, aes(x = x, y = y)) +
-  geom_point()
 ```
 
 Se observa una baja o nula relación entre las variables x e y. No se percibe un patrón lineal entre ambas variables.
@@ -78,17 +74,14 @@ Significatividad Grupal del model
 #### 4. Agregue la linea de regresión al diagrama de dispersión que graficó en el punto 1.¿ qué observa?
 
 ```{r}
-library(psych)
-library(GGally)
-ggpairs(dat, aes(alpha = 0.5),lower = list(continuous = "smooth"))
+# library(psych)
+# library(GGally)
+#ggpairs(dat, aes(alpha = 0.5),lower = list(continuous = "smooth"))
 
 # Creamos el gráfico
 plot(x, y)
 # Línea de regresión
 abline(lm(y ~ x))
-
-
-
 ```
 
 Se observa una linea prácticamente horizontal y una dispersión de puntos que se alejan de la recta.
@@ -114,10 +107,11 @@ x <- μX + σX * Z1
 y <- μY + σY * (ρ * x + sqrt(1 - ρ^2) * Z2)
 dat <- cbind(x,y) #junto los valores en una lista
 plot(dat)
+abline(lm(y ~ x))
 ```
 
 ```{r}
-ggpairs(dat, aes(alpha = 0.5),lower = list(continuous = "smooth"))
+# ggpairs(dat, aes(alpha = 0.5),lower = list(continuous = "smooth"))
 ```
 
 ```{r}
@@ -185,8 +179,8 @@ abline(v = mean(intercepts), col="red", lwd=3, lty=2)
 
 ```{r}
 par(mfrow = c(1, 2))
-plot(density(pendientes))
-plot(density(intercepts))
+plot(density(pendientes, width = .2))
+plot(density(intercepts, width = .2))
 ```
 
 #### 10. Repita la simulación de montecarlo pero sin que la variable X tenga una distribución normal, por ejemplo una distribución uniforme. Considere los puntos 7, 8, 9 de este TP.
@@ -219,9 +213,12 @@ for (i in 1:num_simulations) {
   pendientes[i] <- model$coefficients[2]
   intercepts[i] <- model$coefficients[1]
 }
+
 par(mfrow = c(2, 2))
 hist(pendientes, main = "Distribución de Pendiente Estimadas",xlab = "Pendiente")
+abline(v = mean(pendientes), col="red", lwd=3, lty=2)
 hist(intercepts, main = "Distribución de Intercept Estimados", xlab = "Intercept")
-plot(density(pendientes))
-plot(density(intercepts))
+abline(v = mean(intercepts), col="red", lwd=3, lty=2)
+plot(density(pendientes, width = .2))
+plot(density(intercepts, width = .2))
 ```
