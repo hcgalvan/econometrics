@@ -1,0 +1,213 @@
+---
+title: "Trabajo Practico 2 - Econometria"
+output: html_notebook
+---
+
+#### a) Generación de Variables
+
+Generar 4 variables: una que represente el salario semanal en pesos, dos variables binarias: género y una que represente si estudió en una universidad pública o privada.
+
+Según un estudio de la consultora Ekonomía en 2021, los graduados de universidades privadas en Argentina ganaban en promedio un 27% más que los graduados de universidades públicas al inicio de sus carreras laborales.
+
+Esta brecha salarial tendía a disminuir con los años de experiencia, pero aún se mantenía una diferencia del 17% a favor de los egresados de instituciones privadas después de 10 años de haber obtenido el título.
+
+Las carreras con mayores brechas salariales eran las relacionadas con negocios, administración y finanzas, mientras que en áreas como ingeniería y ciencias exactas, la diferencia era menor.
+
+Cuál es la diferencia de sueldos en base a la experiencia en egresados universidad en argentina
+
+1.  Estudio de PwC Argentina (2021):
+
+-   Los salarios iniciales de recién graduados universitarios eran un 35% menores que los de profesionales con 5 años de experiencia.
+-   Después de 10 años de experiencia, los salarios aumentaban en promedio un 80% en comparación con los ingresos iniciales.
+
+2.  Informe del Observatorio de Inserción Profesional de la UBA (2020):
+
+-   Los graduados de carreras de grado de la Universidad de Buenos Aires duplicaban sus ingresos después de 5 años de experiencia laboral.
+-   La brecha salarial entre recién egresados y profesionales con más de 10 años de experiencia podía llegar al 120% en algunas disciplinas.
+
+3.  Encuesta de Salarios de Profesionales de KPMG (2019):
+
+-   Los salarios promedio de profesionales argentinos con menos de 2 años de experiencia eran un 45% menores que los de aquellos con más de 10 años de trayectoria laboral.
+
+¿Cuál es la diferencia o la brecha entre varones y mujeres universitarias con respecto al sueldo.?
+
+algunos hallazgos e investigaciones previas sobre este tema en Argentina, teniendo en cuenta que la situación podría haber cambiado:
+
+-   Según un estudio del Ministerio de Economía de Argentina en 2021, las mujeres egresadas de universidades ganaban en promedio un 27% menos que sus pares hombres al iniciar sus carreras laborales.
+
+-   El informe "Brechas de Género en la Educación Superior" del Banco Mundial (2020) encontró que la brecha salarial entre hombres y mujeres profesionales en Argentina oscilaba entre el 15% y el 25%, dependiendo del campo de estudio.
+
+-   Una encuesta de la consultora Mercer (2019) reveló que la brecha salarial de género entre egresados universitarios en Argentina era de aproximadamente 22% a favor de los hombres, incluso después de controlar por factores como experiencia, nivel educativo y puesto de trabajo.
+
+-   Según datos del Observatorio de Inserción Profesional de la UBA (2018), las graduadas mujeres de carreras de grado de esa universidad percibían salarios iniciales un 18% menores que sus compañeros varones.
+
+¿Cuál es la varianza de sueldos entre graduados universitarios de economía en argentina?
+
+Sin embargo, puedo compartir algunos hallazgos generales de estudios previos sobre la dispersión salarial en esta profesión en Argentina:
+
+1.  Encuesta de Salarios de UBA Económicas (2020): Este informe reveló que el salario promedio mensual de los graduados de la Facultad de Ciencias Económicas de la Universidad de Buenos Aires oscilaba entre \$45.000 y \$90.000 pesos argentinos, dependiendo de la antigüedad laboral.
+
+2.  Estudio de Salarios de KPMG (2019):\
+    Para el área de Finanzas/Economía, este reporte indicó que los salarios brutos mensuales en Argentina iban desde \$38.000 para posiciones junior hasta \$180.000 para cargos gerenciales.
+
+3.  Reporte de PwC (2018): Según este informe, el rango salarial de economistas en empresas privadas argentinas variaba desde \$30.000 para analistas hasta \$120.000 para puestos de jefaturas.
+
+Es importante destacar que estos datos pueden haber variado en los últimos años debido a factores económicos, políticas salariales, inflación y otros aspectos propios del mercado laboral argentino.
+
+```{r}
+# Generar variables y datos de muestra
+set.seed(123)
+salario_semanal <-300000 
+# experiencia(0 = Falso, 1 = Verdadero)
+experiencia <- sample(0:10, 1000, replace = TRUE)
+
+# Género (0 = Femenino, 1 = Masculino)
+genero <- sample(c(0, 1), 1000, replace = TRUE)
+
+# Universidad (0 = Pública, 1 =  Privada)
+universidad <- sample(c(0, 1), 1000, replace = TRUE)
+
+#valores
+μ_gen <- (0.18 * salario_semanal)
+μ_exp <- (0.05 * salario_semanal) # 35% en 5 años entonces 35/5 = 5% por año
+μ_univ <- (0.17 * salario_semanal)
+error_std_dev <- 50000 #tomando la mitad del valor salarial lo divido en 3 partes
+
+# Salario semanal en pesos
+salario <- salario_semanal + μ_gen * genero + μ_exp * experiencia + μ_univ * universidad + rnorm(1000, 0, error_std_dev)
+dat <- data.frame(salario, genero, experiencia, universidad)
+plot(salario)
+```
+
+Modelo de Regresión
+
+Generar una ecuación en la cual el salario sea explicado por el género, experiencia y por la interacción entre género y asistencia a universidad pública. Interprete la salida de regresión.
+
+-   Chequear residuos para ver si existe heterocedasticidad. ¿Qué observa?
+-   Realizar algún test de heterocedasticidad.
+-   ¿Son robustos los errores estándares? ¿Cómo corrige los errores para que sean consistentes? ¿Qué observa al corregir?
+
+```{r}
+# Ajustar el modelo de regresión lineal
+# Salario semanal en pesos
+set.seed(123)
+modelo <- lm(salario ~ genero + experiencia + genero * universidad)
+summary(modelo)
+
+```
+
+Interpretación:
+
+1.  **Término constante (Intercept)**: El salario base estimado para una persona de género femenino (genero = 0), sin experiencia (experiencia = 0) y que asistió a una universidad publica (universidad = 1) es de 298380.19 unidades monetarias.
+
+2.  **Efecto del género (genero)**: Si una persona es de género masculino (genero = 1), su salario aumenta en 50710.30 unidades monetarias en comparación con una persona de género femenino (genero = 0), manteniendo todo lo demás constante.
+
+3.  **Efecto de la experiencia (experiencia)**: Por cada año adicional de experiencia, el salario aumenta en 15269.17 unidades monetarias, manteniendo todo lo demás constante.
+
+4.  **Efecto de la universidad**: Si asistió a universidad privada (universidad=1), el salario aumenta en 52792.13 unidades monetarias, manteniendo todo lo demás constante.
+
+5.  **Interacción entre género y asistencia a universidad pública (genero:universidad)**: Si una persona es de género masculino (genero = 1) y asistió a una universidad pública (universidad = 0), su salario aumenta 63.81, en comparación con una persona de género femenino que asistió a una universidad privada.
+
+6.  **R-cuadrado ajustado**: El modelo explica aproximadamente el 59.46% de la variabilidad observada en el salario.
+
+7.  **Significancia estadística**: Los coeficientes son estadísticamente significativos (p-value \< 0.001), lo que indica que los efectos del género y la experiencia, son relevantes para explicar el salario, excepto la interacción entre género y asistencia a universidad pública.
+
+8.  Es importante tener en cuenta que los resultados dependen de los datos de muestra generados aleatoriamente. En una situación real, los coeficientes y su interpretación pueden variar según el conjunto de datos y el contexto específico.
+
+9.  Simulación de Regresiones Simular 10 regresiones únicamente con variable dependiente: salario, independientes: género y género×publica, y graficar las rectas de regresión. ¿Qué observa?
+
+```{r}
+#graficos exploratorios, que me pueden dar indicios..
+par=par(mfrow =c (2,2))#forma de distribuir los graficos, en 2 fila 2 colum
+e2=(modelo$residuals)^2
+plot(dat$genero,e2 , main = "e2 en funcion de genero",
+     xlab = "s", ylab = "resid al 2")
+plot(dat$experiencia,e2 , main = "e2 en funcion de experiencia",
+     xlab = "exp", ylab = "resid al 2")
+plot(dat$universidad,e2 , main = "e2 en funcion de universidad",
+     xlab = "male", ylab = "resid al 2")
+plot(modelo$fitted.values,e2 , main = "e2 en funcion de Y ajustado",
+     xlab = "Y ajustado", ylab = "resid al 2")
+par(par) #cierro el grafico
+
+
+```
+
+```{r}
+plot(modelo$fitted.values,e2 , main = "e2 en funcion de Y ajustado",
+     xlab = "Y ajustado", ylab = "resid al 2")
+```
+
+```{r}
+# Gráfico de residuos vs. valores ajustados
+plot(modelo, which = 1)
+```
+
+Observación: En el gráfico de residuos vs. valores ajustados, se puede apreciar que la varianza de los residuos no es constante a lo largo de los valores ajustados, lo que sugiere la presencia de heterocedasticidad.
+
+#### Prueba de heterocedasticidad
+
+```{r}
+# Prueba de Goldfeld-Quandt
+library(lmtest)
+gqtest(modelo)
+```
+
+La prueba de Goldfeld-Quandt tiene un p-valor de 0.9904, lo cual es mayor que el nivel de significancia convencional de 0.05, lo que sugiere no hay evidencia de heterocedasticidad en los residuos.
+
+#### Errores Robustos
+
+```{r}
+# Errores estándar robustos a heterocedasticidad
+library(sandwich)
+coeftest(modelo, vcov = vcovHC(modelo, type = "HC1"))
+
+```
+
+```{r}
+nprima <- 3/8*1000
+valor <- 1000-nprima*2
+#instalar lmtest y abrirla test de G-Q
+library(lmtest)
+
+gqtest(modelo, point=0.5, fraction=valor, order.by = tabla1$s, data = dat)
+```
+
+```{r}
+# Función para realizar una regresión y graficar la recta
+realizar_regresion <- function() {
+  # Generar datos de muestra
+  set.seed(sample(1:10000, 1))  # Semilla aleatoria
+  salario_semanal <-300000 
+  # experiencia(0 = Falso, 1 = Verdadero)
+  experiencia <- sample(0:10, 1000, replace = TRUE)
+  
+  # Género (0 = Femenino, 1 = Masculino)
+  genero <- sample(c(0, 1), 1000, replace = TRUE)
+  
+  # Universidad (0 = Pública, 1 =  Privada)
+  universidad <- sample(c(0, 1), 1000, replace = TRUE)
+  
+  #valores
+  μ_gen <- (0.18 * salario_semanal)
+  μ_exp <- (0.05 * salario_semanal) # 35% en 5 años entonces 35/5 = 5% por año
+  μ_univ <- (0.17 * salario_semanal)
+  error_std_dev <- 50000 #tomando la mitad del valor salarial lo divido en 3 partes
+
+  salario <- salario_semanal + μ_gen * genero + μ_exp * experiencia + μ_univ * universidad + rnorm(1000, 0, error_std_dev)
+  
+  # Ajustar el modelo de regresión lineal
+  modelo <- lm(salario ~ genero + experiencia + genero * universidad)
+  
+  # Graficar la recta de regresión
+  plot(experiencia, salario, xlab = "Experiencia", ylab = "Salario",
+       main = paste("Regresión", sample(1:10000, 1)))
+  abline(modelo, col = "red")
+  
+  return(modelo)
+}
+
+# Realizar la simulación de Monte Carlo y graficar las rectas
+par(mfrow = c(2, 5))  # Configurar la disposición de gráficos
+resultados <- lapply(1:10, realizar_regresion)
+```
