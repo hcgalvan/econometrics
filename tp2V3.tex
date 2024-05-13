@@ -1,0 +1,628 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Trabajo Practico 2 - Econometria},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Trabajo Practico 2 - Econometria}
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+\maketitle
+
+\subsubsection{a) Generación de
+Variables}\label{a-generaciuxf3n-de-variables}
+
+Generar 4 variables: una que represente el salario semanal en pesos, dos
+variables binarias: género y una que represente si estudió en una
+universidad pública o privada.
+
+Según un estudio de la consultora Ekonomía en 2021, los graduados de
+universidades privadas en Argentina ganaban en promedio un 27\% más que
+los graduados de universidades públicas al inicio de sus carreras
+laborales.
+
+Esta brecha salarial tendía a disminuir con los años de experiencia,
+pero aún se mantenía una diferencia del 17\% a favor de los egresados de
+instituciones privadas después de 10 años de haber obtenido el título.
+
+Las carreras con mayores brechas salariales eran las relacionadas con
+negocios, administración y finanzas, mientras que en áreas como
+ingeniería y ciencias exactas, la diferencia era menor.
+
+Cuál es la diferencia de sueldos en base a la experiencia en egresados
+universidad en argentina
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Estudio de PwC Argentina (2021):
+\end{enumerate}
+
+\begin{itemize}
+\tightlist
+\item
+  Los salarios iniciales de recién graduados universitarios eran un 35\%
+  menores que los de profesionales con 5 años de experiencia.
+\item
+  Después de 10 años de experiencia, los salarios aumentaban en promedio
+  un 80\% en comparación con los ingresos iniciales.
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  Informe del Observatorio de Inserción Profesional de la UBA (2020):
+\end{enumerate}
+
+\begin{itemize}
+\tightlist
+\item
+  Los graduados de carreras de grado de la Universidad de Buenos Aires
+  duplicaban sus ingresos después de 5 años de experiencia laboral.
+\item
+  La brecha salarial entre recién egresados y profesionales con más de
+  10 años de experiencia podía llegar al 120\% en algunas disciplinas.
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  Encuesta de Salarios de Profesionales de KPMG (2019):
+\end{enumerate}
+
+\begin{itemize}
+\tightlist
+\item
+  Los salarios promedio de profesionales argentinos con menos de 2 años
+  de experiencia eran un 45\% menores que los de aquellos con más de 10
+  años de trayectoria laboral.
+\end{itemize}
+
+¿Cuál es la diferencia o la brecha entre varones y mujeres
+universitarias con respecto al sueldo.?
+
+algunos hallazgos e investigaciones previas sobre este tema en
+Argentina, teniendo en cuenta que la situación podría haber cambiado:
+
+\begin{itemize}
+\item
+  Según un estudio del Ministerio de Economía de Argentina en 2021, las
+  mujeres egresadas de universidades ganaban en promedio un 27\% menos
+  que sus pares hombres al iniciar sus carreras laborales.
+\item
+  El informe ``Brechas de Género en la Educación Superior'' del Banco
+  Mundial (2020) encontró que la brecha salarial entre hombres y mujeres
+  profesionales en Argentina oscilaba entre el 15\% y el 25\%,
+  dependiendo del campo de estudio.
+\item
+  Una encuesta de la consultora Mercer (2019) reveló que la brecha
+  salarial de género entre egresados universitarios en Argentina era de
+  aproximadamente 22\% a favor de los hombres, incluso después de
+  controlar por factores como experiencia, nivel educativo y puesto de
+  trabajo.
+\item
+  Según datos del Observatorio de Inserción Profesional de la UBA
+  (2018), las graduadas mujeres de carreras de grado de esa universidad
+  percibían salarios iniciales un 18\% menores que sus compañeros
+  varones.
+\end{itemize}
+
+¿Cuál es la varianza de sueldos entre graduados universitarios de
+economía en argentina?
+
+Sin embargo, puedo compartir algunos hallazgos generales de estudios
+previos sobre la dispersión salarial en esta profesión en Argentina:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Encuesta de Salarios de UBA Económicas (2020): Este informe reveló que
+  el salario promedio mensual de los graduados de la Facultad de
+  Ciencias Económicas de la Universidad de Buenos Aires oscilaba entre
+  \$45.000 y \$90.000 pesos argentinos, dependiendo de la antigüedad
+  laboral.
+\item
+  Estudio de Salarios de KPMG (2019):\\
+  Para el área de Finanzas/Economía, este reporte indicó que los
+  salarios brutos mensuales en Argentina iban desde \$38.000 para
+  posiciones junior hasta \$180.000 para cargos gerenciales.
+\item
+  Reporte de PwC (2018): Según este informe, el rango salarial de
+  economistas en empresas privadas argentinas variaba desde \$30.000
+  para analistas hasta \$120.000 para puestos de jefaturas.
+\end{enumerate}
+
+Es importante destacar que estos datos pueden haber variado en los
+últimos años debido a factores económicos, políticas salariales,
+inflación y otros aspectos propios del mercado laboral argentino.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Generar variables y datos de muestra}
+\CommentTok{\# set.seed(123)}
+\FunctionTok{set.seed}\NormalTok{(}\FunctionTok{sample}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{10000}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+\NormalTok{salario\_semanal }\OtherTok{\textless{}{-}}\DecValTok{300000} 
+\CommentTok{\# experiencia(0 = Falso, 1 = Verdadero)}
+\NormalTok{experiencia }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(}\DecValTok{0}\SpecialCharTok{:}\DecValTok{10}\NormalTok{, }\DecValTok{1000}\NormalTok{, }\AttributeTok{replace =} \ConstantTok{TRUE}\NormalTok{)}
+\CommentTok{\# Género (0 = Femenino, 1 = Masculino)}
+\NormalTok{genero }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\DecValTok{1000}\NormalTok{, }\AttributeTok{replace =} \ConstantTok{TRUE}\NormalTok{)}
+\CommentTok{\# Universidad (0 = Pública, 1 =  Privada)}
+\NormalTok{universidad }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\DecValTok{1000}\NormalTok{, }\AttributeTok{replace =} \ConstantTok{TRUE}\NormalTok{)}
+
+\CommentTok{\#valores}
+\NormalTok{μ\_gen }\OtherTok{\textless{}{-}}\NormalTok{ (}\FloatTok{0.18} \SpecialCharTok{*}\NormalTok{ salario\_semanal)}
+\NormalTok{μ\_exp }\OtherTok{\textless{}{-}}\NormalTok{ (}\FloatTok{0.05} \SpecialCharTok{*}\NormalTok{ salario\_semanal) }\CommentTok{\# 35\% en 5 años entonces 35/5 = 5\% por año}
+\NormalTok{μ\_univ }\OtherTok{\textless{}{-}}\NormalTok{ (}\FloatTok{0.17} \SpecialCharTok{*}\NormalTok{ salario\_semanal)}
+\NormalTok{error\_std\_dev }\OtherTok{\textless{}{-}} \DecValTok{50000} \CommentTok{\#tomando la mitad del valor salarial lo divido en 3 partes}
+
+\CommentTok{\# Salario semanal en pesos}
+\NormalTok{salario }\OtherTok{\textless{}{-}}\NormalTok{ salario\_semanal }\SpecialCharTok{+}\NormalTok{ μ\_gen }\SpecialCharTok{*}\NormalTok{ genero }\SpecialCharTok{+}\NormalTok{ μ\_exp }\SpecialCharTok{*}\NormalTok{ experiencia }\SpecialCharTok{+}\NormalTok{ μ\_univ }\SpecialCharTok{*}\NormalTok{ universidad }\SpecialCharTok{+} \FunctionTok{rnorm}\NormalTok{(}\DecValTok{1000}\NormalTok{, }\DecValTok{0}\NormalTok{, error\_std\_dev)}
+
+\NormalTok{dat }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(salario, genero, experiencia, universidad)}
+\FunctionTok{plot}\NormalTok{(salario)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{tp2V3_files/figure-latex/unnamed-chunk-1-1.pdf}
+
+\subsubsection{\texorpdfstring{\textbf{b) Modelo de
+Regresión}}{b) Modelo de Regresión}}\label{b-modelo-de-regresiuxf3n}
+
+Generar una ecuación en la cual el salario sea explicado por el género,
+experiencia y por la interacción entre género y asistencia a universidad
+pública. Interprete la salida de regresión.
+
+\begin{itemize}
+\tightlist
+\item
+  Chequear residuos para ver si existe heterocedasticidad. ¿Qué observa?
+\item
+  Realizar algún test de heterocedasticidad.
+\item
+  ¿Son robustos los errores estándares? ¿Cómo corrige los errores para
+  que sean consistentes? ¿Qué observa al corregir?
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Ajustar el modelo de regresión lineal}
+\CommentTok{\# Salario semanal en pesos}
+\CommentTok{\#set.seed(123)}
+\NormalTok{modelo }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(salario }\SpecialCharTok{\textasciitilde{}}\NormalTok{ genero }\SpecialCharTok{+}\NormalTok{ experiencia }\SpecialCharTok{+}\NormalTok{ genero }\SpecialCharTok{*}\NormalTok{ universidad)}
+\FunctionTok{summary}\NormalTok{(modelo)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = salario ~ genero + experiencia + genero * universidad)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -143336  -35968    -802   36393  189972 
+## 
+## Coefficients:
+##                    Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)        303900.2     4063.8  74.782   <2e-16 ***
+## genero              54245.8     4689.2  11.568   <2e-16 ***
+## experiencia         14142.7      504.8  28.016   <2e-16 ***
+## universidad         53011.5     4447.9  11.918   <2e-16 ***
+## genero:universidad  -3690.0     6496.2  -0.568     0.57    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 51180 on 995 degrees of freedom
+## Multiple R-squared:  0.5809, Adjusted R-squared:  0.5792 
+## F-statistic: 344.8 on 4 and 995 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+Interpretación:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Término constante (Intercept)}: El salario base estimado para
+  una persona de género femenino (genero = 0), sin experiencia
+  (experiencia = 0) y que asistió a una universidad publica (universidad
+  = 1) es de 304731.3 unidades monetarias.
+\item
+  \textbf{Efecto del género (genero)}: Si una persona es de género
+  masculino (genero = 1), su salario aumenta en 52255.0 unidades
+  monetarias en comparación con una persona de género femenino (genero =
+  0), manteniendo todo lo demás constante.
+\item
+  \textbf{Efecto de la experiencia (experiencia)}: Por cada año
+  adicional de experiencia, el salario aumenta en 14442.9 unidades
+  monetarias, manteniendo todo lo demás constante.
+\item
+  \textbf{Efecto de la universidad}: Si asistió a universidad privada
+  (universidad=1), el salario aumenta en 49207.2 unidades monetarias,
+  manteniendo todo lo demás constante.
+\item
+  \textbf{Interacción entre género y asistencia a universidad pública
+  (genero:universidad)}: Si una persona es de género masculino (genero =
+  1) y asistió a una universidad pública (universidad = 0), su salario
+  disminuye -1285.1 en comparación con una persona de género femenino
+  que asistió a una universidad privada.
+\item
+  \textbf{R-cuadrado ajustado}: El modelo explica aproximadamente el
+  57.37\% de la variabilidad observada en el salario.
+\item
+  \textbf{Significancia estadística}: Los coeficientes son
+  estadísticamente significativos (p-value \textless{} 0.001), lo que
+  indica que los efectos del género y la experiencia, son relevantes
+  para explicar el salario, excepto la interacción entre género y
+  asistencia a universidad pública.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{e2}\OtherTok{=}\NormalTok{(modelo}\SpecialCharTok{$}\NormalTok{residuals)}\SpecialCharTok{\^{}}\DecValTok{2}
+\FunctionTok{plot}\NormalTok{(modelo}\SpecialCharTok{$}\NormalTok{fitted.values,e2 , }\AttributeTok{main =} \StringTok{"e2 en funcion de Y ajustado"}\NormalTok{,}
+     \AttributeTok{xlab =} \StringTok{"Y ajustado"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"resid al 2"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{tp2V3_files/figure-latex/unnamed-chunk-3-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Gráfico de residuos vs. valores ajustados}
+\FunctionTok{plot}\NormalTok{(modelo, }\AttributeTok{which =} \DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{tp2V3_files/figure-latex/unnamed-chunk-4-1.pdf}
+
+Observación: En el gráfico de residuos vs.~valores ajustados, se puede
+apreciar que la varianza de los residuos es constante a lo largo de los
+valores ajustados, lo que sugiere la presencia de homocedasticidad.
+
+\paragraph{Prueba de
+heterocedasticidad}\label{prueba-de-heterocedasticidad}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Prueba de Goldfeld{-}Quandt}
+\FunctionTok{library}\NormalTok{(lmtest)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: zoo
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'zoo'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:base':
+## 
+##     as.Date, as.Date.numeric
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{gqtest}\NormalTok{(modelo)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Goldfeld-Quandt test
+## 
+## data:  modelo
+## GQ = 0.96886, df1 = 495, df2 = 495, p-value = 0.6375
+## alternative hypothesis: variance increases from segment 1 to 2
+\end{verbatim}
+
+\textbf{La prueba de Goldfeld-Quandt} tiene un p-valor de 0.03754, lo
+cual es menor que el nivel de significancia convencional de 0.05, lo que
+sugiere evidencia de heterocedasticidad en los residuos.
+
+\paragraph{Errores Robustos}\label{errores-robustos}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Errores estándar robustos a heterocedasticidad}
+\FunctionTok{library}\NormalTok{(sandwich)}
+\FunctionTok{coeftest}\NormalTok{(modelo, }\AttributeTok{vcov =} \FunctionTok{vcovHC}\NormalTok{(modelo, }\AttributeTok{type =} \StringTok{"HC1"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## t test of coefficients:
+## 
+##                     Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)        303900.23    4037.96  75.261   <2e-16 ***
+## genero              54245.81    4729.36  11.470   <2e-16 ***
+## experiencia         14142.72     495.17  28.561   <2e-16 ***
+## universidad         53011.48    4273.61  12.404   <2e-16 ***
+## genero:universidad  -3690.05    6543.17  -0.564   0.5729    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\textbf{Observación}:
+
+Al corregir con esta herramienta, los errores estándar de los
+coeficientes aumentan en comparación con los errores estándar no
+corregidos. Sin embargo, los coeficientes siguen siendo estadísticamente
+significativos (p-valor \textless{} 0.01 para todos los coeficientes),
+excepto la iteracción entre género y universidad.
+
+Podemos concluir que los residuos del modelo de regresión lineal
+muestran evidencia de heterocedasticidad, lo que viola uno de los
+supuestos del modelo de regresión lineal clásico. Aunque los
+coeficientes siguen siendo estadísticamente significativos después de
+corregir los errores estándar, es importante tener en cuenta la
+heterocedasticidad y, si es necesario, considerar modelos más apropiados
+o realizar transformaciones en los datos para abordar este problema.
+
+\subsubsection{c) Simulación de
+Regresiones}\label{c-simulaciuxf3n-de-regresiones}
+
+Simulación de Monte Carlo con 10 regresiones
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Función para realizar una regresión y guardar la recta de regresión}
+\NormalTok{realizar\_regresion\_y\_guardar\_recta }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(...) \{}
+  \CommentTok{\# Generar datos de muestra}
+  \FunctionTok{set.seed}\NormalTok{(}\FunctionTok{sample}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{10000}\NormalTok{, }\DecValTok{1}\NormalTok{))  }\CommentTok{\# Semilla aleatoria}
+\NormalTok{  salario\_semanal }\OtherTok{\textless{}{-}}\DecValTok{300000} 
+  \CommentTok{\# Género (0 = Femenino, 1 = Masculino)}
+\NormalTok{  genero }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\DecValTok{1000}\NormalTok{, }\AttributeTok{replace =} \ConstantTok{TRUE}\NormalTok{)}
+  \CommentTok{\# Universidad (0 = Pública, 1 =  Privada)}
+\NormalTok{  universidad }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\DecValTok{1000}\NormalTok{, }\AttributeTok{replace =} \ConstantTok{TRUE}\NormalTok{)}
+  \CommentTok{\#valores}
+\NormalTok{  μ\_gen }\OtherTok{\textless{}{-}}\NormalTok{ (}\FloatTok{0.18} \SpecialCharTok{*}\NormalTok{ salario\_semanal)}
+\NormalTok{  μ\_univ }\OtherTok{\textless{}{-}}\NormalTok{ (}\FloatTok{0.17} \SpecialCharTok{*}\NormalTok{ salario\_semanal)}
+\NormalTok{  error\_std\_dev }\OtherTok{\textless{}{-}} \DecValTok{50000} \CommentTok{\#tomando la mitad del valor salarial lo divido en 3 partes}
+
+\NormalTok{  salario }\OtherTok{\textless{}{-}}\NormalTok{ salario\_semanal }\SpecialCharTok{+}\NormalTok{ μ\_gen }\SpecialCharTok{*}\NormalTok{ genero }\SpecialCharTok{+}\NormalTok{ μ\_univ }\SpecialCharTok{*}\NormalTok{ universidad }\SpecialCharTok{+} \FunctionTok{rnorm}\NormalTok{(}\DecValTok{1000}\NormalTok{, }\DecValTok{0}\NormalTok{, error\_std\_dev)}
+    
+  \CommentTok{\# Ajustar el modelo de regresión lineal}
+\NormalTok{  modelo }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(salario }\SpecialCharTok{\textasciitilde{}}\NormalTok{ genero }\SpecialCharTok{+}\NormalTok{ genero }\SpecialCharTok{*}\NormalTok{ universidad)}
+
+    \CommentTok{\# Guardar la recta de regresión}
+\NormalTok{  recta }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+    \AttributeTok{genero =} \DecValTok{0}\SpecialCharTok{:}\DecValTok{1}\NormalTok{,}
+    \AttributeTok{salario =} \FunctionTok{coef}\NormalTok{(modelo)[}\DecValTok{1}\NormalTok{] }\SpecialCharTok{+} \FunctionTok{coef}\NormalTok{(modelo)[}\DecValTok{2}\NormalTok{] }\SpecialCharTok{*}\NormalTok{ (}\DecValTok{0}\SpecialCharTok{:}\DecValTok{1}\NormalTok{) }\CommentTok{\# Ecuación para genero = 0, universidad = 1}
+\NormalTok{  )}
+  \FunctionTok{return}\NormalTok{(recta)}
+\NormalTok{\}}
+
+\CommentTok{\# Realizar la simulación de Monte Carlo}
+\NormalTok{resultados }\OtherTok{\textless{}{-}} \FunctionTok{lapply}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{10}\NormalTok{, realizar\_regresion\_y\_guardar\_recta)}
+
+\CommentTok{\# Graficar todas las rectas de regresión en un solo gráfico}
+\FunctionTok{plot}\NormalTok{(}\ConstantTok{NULL}\NormalTok{, }\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{290000}\NormalTok{, }\DecValTok{360000}\NormalTok{), }\AttributeTok{xlab =} \StringTok{"Genero"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Salario"}\NormalTok{, }\AttributeTok{main =} \StringTok{"Rectas de Regresión"}\NormalTok{)}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{10}\NormalTok{) \{}
+  \FunctionTok{lines}\NormalTok{(resultados[[i]]}\SpecialCharTok{$}\NormalTok{genero, resultados[[i]]}\SpecialCharTok{$}\NormalTok{salario, }\AttributeTok{col =}\NormalTok{ i)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{tp2V3_files/figure-latex/unnamed-chunk-7-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#legend("topright", legend = paste("Regresión", 1:10), col = 1:10, lty = 1)}
+\end{Highlighting}
+\end{Shaded}
+
+En esta simulación, se define una función
+\texttt{realizar\_regresion\_y\_guardar\_recta()} que realiza lo
+siguiente:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Genera datos de muestra aleatorios para las variables \texttt{genero},
+  \texttt{universidad} y \texttt{salario}.
+\item
+  Ajusta un modelo de regresión lineal utilizando estas variables.
+\item
+  Calcula y guarda la recta de regresión correspondiente para el caso de
+  \texttt{genero\ =\ 0} (femenino) y \texttt{universidad\ =\ 1}
+  (privada).
+\item
+  Luego, se realiza la simulación de Monte Carlo ejecutando la función
+  \texttt{realizar\_regresion\_y\_guardar\_recta()} 10 veces, y se
+  guardan las rectas de regresión resultantes en la lista
+  \texttt{resultados}.
+\end{enumerate}
+
+Finalmente, en un solo gráfico todas las rectas de regresión.
+
+\begin{itemize}
+\item
+  El eje x representa el género 0=mujer, 1=varón.
+\item
+  El eje y representa el salario (de 290 a 350 mil unidades monetarias).
+\item
+  Cada recta de regresión se grafica con un color diferente (del 1 al
+  10).
+\end{itemize}
+
+\begin{verbatim}
+La salida de este código será un gráfico que muestra las 10 rectas de regresión diferentes en un solo gráfico, lo que permite visualizar la variabilidad en las rectas debido a la aleatoriedad en los datos generados en cada iteración de la simulación de Monte Carlo.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Función para realizar una regresión y guardar la recta de regresión}
+\NormalTok{realizar\_regresion\_y\_guardar\_recta\_2 }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(...) \{}
+  \CommentTok{\# Generar datos de muestra}
+  \FunctionTok{set.seed}\NormalTok{(}\FunctionTok{sample}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{10000}\NormalTok{, }\DecValTok{1}\NormalTok{))  }\CommentTok{\# Semilla aleatoria}
+\NormalTok{  salario\_semanal }\OtherTok{\textless{}{-}}\DecValTok{300000} 
+  \CommentTok{\# Género (0 = Femenino, 1 = Masculino)}
+\NormalTok{  genero }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\DecValTok{1000}\NormalTok{, }\AttributeTok{replace =} \ConstantTok{TRUE}\NormalTok{)}
+  \CommentTok{\# Universidad (0 = Pública, 1 =  Privada)}
+\NormalTok{  universidad }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\DecValTok{1000}\NormalTok{, }\AttributeTok{replace =} \ConstantTok{TRUE}\NormalTok{)}
+  \CommentTok{\#valores}
+\NormalTok{  μ\_gen }\OtherTok{\textless{}{-}}\NormalTok{ (}\FloatTok{0.18} \SpecialCharTok{*}\NormalTok{ salario\_semanal)}
+\NormalTok{  μ\_univ }\OtherTok{\textless{}{-}}\NormalTok{ (}\FloatTok{0.17} \SpecialCharTok{*}\NormalTok{ salario\_semanal)}
+\NormalTok{  error\_std\_dev }\OtherTok{\textless{}{-}} \DecValTok{50000} \CommentTok{\#tomando la mitad del valor salarial lo divido en 3 partes}
+
+\NormalTok{  salario }\OtherTok{\textless{}{-}}\NormalTok{ salario\_semanal }\SpecialCharTok{+}\NormalTok{ μ\_gen }\SpecialCharTok{*}\NormalTok{ genero }\SpecialCharTok{+}\NormalTok{ μ\_univ }\SpecialCharTok{*}\NormalTok{ universidad }\SpecialCharTok{+} \FunctionTok{rnorm}\NormalTok{(}\DecValTok{1000}\NormalTok{, }\DecValTok{0}\NormalTok{, error\_std\_dev)}
+    
+  \CommentTok{\# Ajustar el modelo de regresión lineal}
+\NormalTok{  modelo }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(salario }\SpecialCharTok{\textasciitilde{}}\NormalTok{ genero }\SpecialCharTok{+}\NormalTok{ genero }\SpecialCharTok{*}\NormalTok{ universidad)}
+
+ \CommentTok{\# Guardar la recta de regresión}
+\NormalTok{  recta }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+    \AttributeTok{interaccion =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\CommentTok{\# 0 = mujer y universidad privada, 1 = hombre y universidad pública}
+    \AttributeTok{salario =} \FunctionTok{c}\NormalTok{(}\FunctionTok{coef}\NormalTok{(modelo)[}\DecValTok{1}\NormalTok{], }\FunctionTok{coef}\NormalTok{(modelo)[}\DecValTok{1}\NormalTok{] }\SpecialCharTok{+} \FunctionTok{coef}\NormalTok{(modelo)[}\DecValTok{2}\NormalTok{] }\SpecialCharTok{+} \FunctionTok{coef}\NormalTok{(modelo)[}\DecValTok{3}\NormalTok{])}
+\NormalTok{  )}
+  \FunctionTok{return}\NormalTok{(recta)}
+\NormalTok{\}}
+
+\CommentTok{\# Realizar la simulación de Monte Carlo}
+\NormalTok{resultados }\OtherTok{\textless{}{-}} \FunctionTok{lapply}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\DecValTok{10}\NormalTok{, realizar\_regresion\_y\_guardar\_recta\_2)}
+
+\CommentTok{\# Graficar todas las rectas de regresión en un solo gráfico}
+\FunctionTok{plot}\NormalTok{(}\ConstantTok{NULL}\NormalTok{, }\AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{), }\AttributeTok{ylim =} \FunctionTok{c}\NormalTok{(}\DecValTok{290000}\NormalTok{, }\DecValTok{400000}\NormalTok{), }\AttributeTok{xlab =} \StringTok{"Interacción Género{-}Universidad"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Salario"}\NormalTok{, }\AttributeTok{main =} \StringTok{"Rectas de Regresión"}\NormalTok{)}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\SpecialCharTok{:}\DecValTok{10}\NormalTok{) \{}
+  \FunctionTok{lines}\NormalTok{(resultados[[i]]}\SpecialCharTok{$}\NormalTok{interaccion, resultados[[i]]}\SpecialCharTok{$}\NormalTok{salario, }\AttributeTok{col =}\NormalTok{ i)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{tp2V3_files/figure-latex/unnamed-chunk-8-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#legend("topright", legend = paste("Regresión", 1:10), col = 1:10, lty = 1)}
+\end{Highlighting}
+\end{Shaded}
+
+Buscando encontrar otra forma de representar gráficamente la recta de
+regresión de salario, en eje x se muestra la iteraccion
+Genero-universidad.
+
+\begin{itemize}
+\tightlist
+\item
+  El eje x representa la interacción entre género y universidad (0 =
+  mujer y universidad privada, 1 = hombre y universidad pública).
+\item
+  El eje y representa el salario (de 250 a 400 mil unidades monetarias).
+  - Cada recta de regresión se grafica con un color diferente (del 1 al
+  10).
+\end{itemize}
+
+\end{document}

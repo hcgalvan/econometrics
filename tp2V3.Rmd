@@ -1,9 +1,11 @@
 ---
 title: "Trabajo Practico 2 - Econometria"
-output: html_notebook
+output:
+  html_notebook: default
+  html_document: null
 ---
 
-#### a) Generación de Variables
+### a) Generación de Variables
 
 Generar 4 variables: una que represente el salario semanal en pesos, dos variables binarias: género y una que represente si estudió en una universidad pública o privada.
 
@@ -79,7 +81,7 @@ dat <- data.frame(salario, genero, experiencia, universidad)
 plot(salario)
 ```
 
-Modelo de Regresión
+### **b) Modelo de Regresión**
 
 Generar una ecuación en la cual el salario sea explicado por el género, experiencia y por la interacción entre género y asistencia a universidad pública. Interprete la salida de regresión.
 
@@ -98,40 +100,22 @@ summary(modelo)
 
 Interpretación:
 
-1.  **Término constante (Intercept)**: El salario base estimado para una persona de género femenino (genero = 0), sin experiencia (experiencia = 0) y que asistió a una universidad publica (universidad = 1) es de 297397.8 unidades monetarias.
+1.  **Término constante (Intercept)**: El salario base estimado para una persona de género femenino (genero = 0), sin experiencia (experiencia = 0) y que asistió a una universidad publica (universidad = 1) es de 304731.3 unidades monetarias.
 
-2.  **Efecto del género (genero)**: Si una persona es de género masculino (genero = 1), su salario aumenta en 50731.3 unidades monetarias en comparación con una persona de género femenino (genero = 0), manteniendo todo lo demás constante.
+2.  **Efecto del género (genero)**: Si una persona es de género masculino (genero = 1), su salario aumenta en 52255.0 unidades monetarias en comparación con una persona de género femenino (genero = 0), manteniendo todo lo demás constante.
 
-3.  **Efecto de la experiencia (experiencia)**: Por cada año adicional de experiencia, el salario aumenta en 15403.3 unidades monetarias, manteniendo todo lo demás constante.
+3.  **Efecto de la experiencia (experiencia)**: Por cada año adicional de experiencia, el salario aumenta en 14442.9 unidades monetarias, manteniendo todo lo demás constante.
 
-4.  **Efecto de la universidad**: Si asistió a universidad privada (universidad=1), el salario aumenta en 53388.2 unidades monetarias, manteniendo todo lo demás constante.
+4.  **Efecto de la universidad**: Si asistió a universidad privada (universidad=1), el salario aumenta en 49207.2 unidades monetarias, manteniendo todo lo demás constante.
 
-5.  **Interacción entre género y asistencia a universidad pública (genero:universidad)**: Si una persona es de género masculino (genero = 1) y asistió a una universidad pública (universidad = 0), su salario disminuye -524, en comparación con una persona de género femenino que asistió a una universidad privada.
+5.  **Interacción entre género y asistencia a universidad pública (genero:universidad)**: Si una persona es de género masculino (genero = 1) y asistió a una universidad pública (universidad = 0), su salario disminuye -1285.1 en comparación con una persona de género femenino que asistió a una universidad privada.
 
-6.  **R-cuadrado ajustado**: El modelo explica aproximadamente el 57.87% de la variabilidad observada en el salario.
+6.  **R-cuadrado ajustado**: El modelo explica aproximadamente el 57.37% de la variabilidad observada en el salario.
 
 7.  **Significancia estadística**: Los coeficientes son estadísticamente significativos (p-value \< 0.001), lo que indica que los efectos del género y la experiencia, son relevantes para explicar el salario, excepto la interacción entre género y asistencia a universidad pública.
 
-8.  Simulación de Regresiones Simular 10 regresiones únicamente con variable dependiente: salario, independientes: género y género×publica, y graficar las rectas de regresión. ¿Qué observa?
-
 ```{r}
-#graficos exploratorios, que me pueden dar indicios..
-par=par(mfrow =c (2,2))#forma de distribuir los graficos, en 2 fila 2 colum
 e2=(modelo$residuals)^2
-plot(dat$genero,e2 , main = "e2 en funcion de genero",
-     xlab = "s", ylab = "resid al 2")
-plot(dat$experiencia,e2 , main = "e2 en funcion de experiencia",
-     xlab = "exp", ylab = "resid al 2")
-plot(dat$universidad,e2 , main = "e2 en funcion de universidad",
-     xlab = "male", ylab = "resid al 2")
-plot(modelo$fitted.values,e2 , main = "e2 en funcion de Y ajustado",
-     xlab = "Y ajustado", ylab = "resid al 2")
-par(par) #cierro el grafico
-
-
-```
-
-```{r}
 plot(modelo$fitted.values,e2 , main = "e2 en funcion de Y ajustado",
      xlab = "Y ajustado", ylab = "resid al 2")
 ```
@@ -141,7 +125,7 @@ plot(modelo$fitted.values,e2 , main = "e2 en funcion de Y ajustado",
 plot(modelo, which = 1)
 ```
 
-Observación: En el gráfico de residuos vs. valores ajustados, se puede apreciar que la varianza de los residuos no es constante a lo largo de los valores ajustados, lo que sugiere la presencia de heterocedasticidad.
+Observación: En el gráfico de residuos vs. valores ajustados, se puede apreciar que la varianza de los residuos es constante a lo largo de los valores ajustados, lo que sugiere la presencia de homocedasticidad.
 
 #### Prueba de heterocedasticidad
 
@@ -151,7 +135,7 @@ library(lmtest)
 gqtest(modelo)
 ```
 
-**La prueba de Goldfeld-Quandt** tiene un p-valor de 0.2617, lo cual es mayor que el nivel de significancia convencional de 0.05, lo que sugiere no hay evidencia de heterocedasticidad en los residuos.
+**La prueba de Goldfeld-Quandt** tiene un p-valor de 0.03754, lo cual es menor que el nivel de significancia convencional de 0.05, lo que sugiere evidencia de heterocedasticidad en los residuos.
 
 #### Errores Robustos
 
@@ -162,42 +146,15 @@ coeftest(modelo, vcov = vcovHC(modelo, type = "HC1"))
 
 ```
 
-**Observación**: Al corregir los errores estándar utilizando errores estándar robustos a heterocedasticidad (vcovHC), los errores estándar de los coeficientes tienen variaciones mínimos (+/-) en comparación con los errores estándar no corregidos. Sin embargo, los coeficientes siguen siendo estadísticamente significativos (p-valor \< 0.01 para todos los coeficientes).
+**Observación**:
 
-```{r}
-# Función para realizar una regresión y graficar la recta
-realizar_regresion_y_graficar <- function(...) {
-  # Generar datos de muestra
-  set.seed(sample(1:10000, 1))  # Semilla aleatoria
-  salario_semanal <-300000 
-  # Género (0 = Femenino, 1 = Masculino)
-  genero <- sample(c(0, 1), 1000, replace = TRUE)
-  # Universidad (0 = Pública, 1 =  Privada)
-  universidad <- sample(c(0, 1), 1000, replace = TRUE)
-  #valores
-  μ_gen <- (0.18 * salario_semanal)
-  μ_exp <- (0.05 * salario_semanal) # 35% en 5 años entonces 35/5 = 5% por año
-  μ_univ <- (0.17 * salario_semanal)
-  error_std_dev <- 50000 #tomando la mitad del valor salarial lo divido en 3 partes
+Al corregir con esta herramienta, los errores estándar de los coeficientes aumentan en comparación con los errores estándar no corregidos. Sin embargo, los coeficientes siguen siendo estadísticamente significativos (p-valor \< 0.01 para todos los coeficientes), excepto la iteracción entre género y universidad.
 
-  salario <- salario_semanal + μ_gen * genero + μ_univ * universidad + rnorm(1000, 0, error_std_dev)
-  
-  
-  # Ajustar el modelo de regresión lineal
-  modelo <- lm(salario ~ genero + genero * universidad)
-  
-  # Graficar la recta de regresión
-  plot(genero, salario, xlab = "Experiencia", ylab = "Salario", main = "Recta de Regresión")
-  abline(modelo, col = "red")
-  
-  return(modelo)
-}
+Podemos concluir que los residuos del modelo de regresión lineal muestran evidencia de heterocedasticidad, lo que viola uno de los supuestos del modelo de regresión lineal clásico. Aunque los coeficientes siguen siendo estadísticamente significativos después de corregir los errores estándar, es importante tener en cuenta la heterocedasticidad y, si es necesario, considerar modelos más apropiados o realizar transformaciones en los datos para abordar este problema.
 
-# Realizar la simulación de Monte Carlo
+### c) Simulación de Regresiones
 
-resultados <- lapply(1:10, realizar_regresion_y_graficar)
-
-```
+Simulación de Monte Carlo con 10 regresiones
 
 ```{r}
 # Función para realizar una regresión y guardar la recta de regresión
@@ -241,25 +198,25 @@ for (i in 1:10) {
 
 En esta simulación, se define una función `realizar_regresion_y_guardar_recta()` que realiza lo siguiente:
 
-1.   Genera datos de muestra aleatorios para las variables `genero`, `universidad` y `salario`.
+1.  Genera datos de muestra aleatorios para las variables `genero`, `universidad` y `salario`.
 
-2.   Ajusta un modelo de regresión lineal utilizando estas variables.
+2.  Ajusta un modelo de regresión lineal utilizando estas variables.
 
-3.   Calcula y guarda la recta de regresión correspondiente para el caso de `genero = 0` (femenino) y `universidad = 1` (privada).
+3.  Calcula y guarda la recta de regresión correspondiente para el caso de `genero = 0` (femenino) y `universidad = 1` (privada).
 
-4.   Luego, se realiza la simulación de Monte Carlo ejecutando la función `realizar_regresion_y_guardar_recta()` 10 veces, y se guardan las rectas de regresión resultantes en la lista `resultados`.
+4.  Luego, se realiza la simulación de Monte Carlo ejecutando la función `realizar_regresion_y_guardar_recta()` 10 veces, y se guardan las rectas de regresión resultantes en la lista `resultados`.
 
-Finalmente, en un solo gráfico todas las rectas de regresión. En este gráfico:
+Finalmente, en un solo gráfico todas las rectas de regresión.
 
--    El eje x representa la experiencia (de 0 a 20 años).
+-   El eje x representa el género 0=mujer, 1=varón.
 
--   El eje y representa el salario (de 0 a 970 mil unidades monetarias).
+-   El eje y representa el salario (de 290 a 350 mil unidades monetarias).
 
--    Cada recta de regresión se grafica con un color diferente (del 1 al 10).
+-   Cada recta de regresión se grafica con un color diferente (del 1 al 10).
 
--    Se incluye una leyenda en la esquina superior derecha que indica el número de regresión correspondiente a cada color.
-
-    La salida de este código será un gráfico que muestra las 10 rectas de regresión diferentes en un solo gráfico, lo que permite visualizar la variabilidad en las rectas debido a la aleatoriedad en los datos generados en cada iteración de la simulación de Monte Carlo.
+```         
+La salida de este código será un gráfico que muestra las 10 rectas de regresión diferentes en un solo gráfico, lo que permite visualizar la variabilidad en las rectas debido a la aleatoriedad en los datos generados en cada iteración de la simulación de Monte Carlo.
+```
 
 ```{r}
 # Función para realizar una regresión y guardar la recta de regresión
@@ -303,53 +260,4 @@ for (i in 1:10) {
 Buscando encontrar otra forma de representar gráficamente la recta de regresión de salario, en eje x se muestra la iteraccion Genero-universidad.
 
 -   El eje x representa la interacción entre género y universidad (0 = mujer y universidad privada, 1 = hombre y universidad pública).
-
-```{=html}
-<!-- -->
-```
--   El eje y representa el salario (de 0 a 20000 unidades monetarias).
-
-```{=html}
-<!-- -->
-```
--   Cada recta de regresión se grafica con un color diferente (del 1 al 10).
-
-```{r}
-# Función para realizar una regresión y guardar la recta de regresión
-realizar_regresion_y_guardar_recta <- function(...) {
-  # Generar datos de muestra
-  set.seed(sample(1:10000, 1))  # Semilla aleatoria
-  salario_semanal <-300000 
-  # Género (0 = Femenino, 1 = Masculino)
-  genero <- sample(c(0, 1), 1000, replace = TRUE)
-  # Universidad (0 = Pública, 1 =  Privada)
-  universidad <- sample(c(0, 1), 1000, replace = TRUE)
-  #valores
-  μ_gen <- (0.18 * salario_semanal)
-  μ_univ <- (0.17 * salario_semanal)
-  error_std_dev <- 50000 #tomando la mitad del valor salarial lo divido en 3 partes
-
-  salario <- salario_semanal + μ_gen * genero + μ_univ * universidad + rnorm(1000, 0, error_std_dev)
-    
-  # Ajustar el modelo de regresión lineal
-  modelo <- lm(salario ~ genero + genero * universidad)
-  
-  # Guardar la recta de regresión
-  recta <- data.frame(
-    interaccion = c(0, 1), # 0 = mujer y universidad privada, 1 = hombre y universidad pública
-    salario = c(coef(modelo)[1], coef(modelo)[1] + coef(modelo)[2] + coef(modelo)[3])
-  )
-  
-  return(recta)
-}
-
-# Realizar la simulación de Monte Carlo
-resultados <- lapply(1:10, realizar_regresion_y_guardar_recta)
-
-# Graficar todas las rectas de regresión en un solo gráfico
-plot(NULL, xlim = c(0, 1), ylim = c(290000, 350000), xlab = "Interacción Género-Universidad", ylab = "Salario", main = "Rectas de Regresión")
-for (i in 1:10) {
-  lines(resultados[[i]]$interaccion, resultados[[i]]$salario, col = i)
-}
-#legend("topright", legend = paste("Regresión", 1:10), col = 1:10, lty = 1)
-```
+-   El eje y representa el salario (de 250 a 400 mil unidades monetarias). - Cada recta de regresión se grafica con un color diferente (del 1 al 10).
