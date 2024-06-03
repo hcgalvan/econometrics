@@ -1,0 +1,12 @@
+name: nb-boostrapping
+title: nb-boostrapping
+username: brainhack
+account: brainhack
+server: posit.cloud
+hostUrl: https://api.posit.cloud/v1
+appId: 8250847
+bundleId: 8657214
+url: https://posit.cloud/content/8250847
+version: 1
+asMultiple: FALSE
+asStatic: TRUE

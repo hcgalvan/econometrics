@@ -1,0 +1,636 @@
+---
+title: "TP 4 - Variables Instrumentales y Reg LOGIT/PROBIT"
+output: html_notebook
+---
+
+```{r}
+# Instalamos los paquetes necesarios
+#install.packages("AER")
+#install.packages("stargazer")
+#install.packages("ivreg", dependencies = TRUE)
+library(AER)
+library(stargazer)
+library(ivreg)
+
+```
+
+## Variables Instrumentales
+
+```{r}
+
+# cargamos datos y analizamos las base de datos
+data("CigarettesSW")
+summary(CigarettesSW)
+?CigarettesSW # describe base de datos.
+
+```
+
+#### Armado de Variables y chequeo de correlación entre instrumento y variable instrumentada
+
+```{r}
+# precios "reales"  per capita p
+CigarettesSW$rprecio <- with(CigarettesSW, price / cpi)
+
+#  impuesto a las ventas imptv
+CigarettesSW$imptv <- with(CigarettesSW, (taxs - tax) / cpi)
+```
+
+```{r}
+# correlación entre la variable impuesto a las ventas, "precio" y precio real
+cor(CigarettesSW$imptv, CigarettesSW$price)
+cor(CigarettesSW$imptv, CigarettesSW$rprecio)
+```
+
+```{r}
+# generamos la muestra para el año 1995
+c1995 <- subset(CigarettesSW, year == "1995")
+```
+
+```{r}
+# Estimación con IVREG I caso
+# perform TSLS using 'ivreg()'
+cig_ivreg <- ivreg(log(packs) ~ log(rprecio) | imptv, data = c1995)
+coeftest(cig_ivreg, vcov = vcovHC, type = "HC1")
+summary(cig_ivreg)
+```
+
+Intepretación de los resultados anteriores:\
+Es una regresión de variables instrumentales (IV) utilizando el método de mínimos cuadrados en dos etapas (2SLS). La variable dependiente es el logaritmo de la cantidad de paquetes de cigarrillos vendidos (`log(packs)`), y la variable independiente es el logaritmo del precio real de los cigarrillos (`log(rprecio)`). La variable `imptv` se utiliza como instrumento para `log(rprecio)`.
+
+Observaciones principales:
+
+1.  Coeficientes:
+
+    -   Intercepto: 9.7199 (significativo al 0.1%)
+    -   `log(rprecio)`: -1.0836 (significativo al 1%)
+
+    Interpretación: Un aumento del 1% en el precio real de los cigarrillos está asociado con una disminución del 1.08% en la cantidad de paquetes vendidos, manteniendo el resto de factores constantes. Esta relación es estadísticamente significativa.
+
+2.  Bondad del ajuste:
+
+    -   R² ajustado: 0.3881
+    -   Error estándar residual: 0.1904
+
+    Interpretación: El modelo explica aproximadamente el 38.81% de la variabilidad en la cantidad de paquetes vendidos. El error estándar residual de 0.1904 sugiere que, en promedio, las predicciones del modelo se desvían en un 19.04% de los valores reales.
+
+3.  Pruebas de diagnóstico:
+
+    a.  Instrumentos débiles:
+        -   Estadístico: 40.956 (p-valor \< 0.001)
+        -   Interpretación: Se rechaza la hipótesis nula de que el instrumento es débil. Esto sugiere que `imptv` es un buen instrumento para `log(rprecio)`, ya que está fuertemente correlacionado con esta variable.
+    b.  Wu-Hausman:
+        -   Estadístico: 0.314 (p-valor = 0.578)
+        -   Interpretación: No se rechaza la hipótesis nula. Esto sugiere que no hay evidencia significativa de endogeneidad en `log(rprecio)`. En otras palabras, tratar `log(rprecio)` como exógeno en una regresión OLS simple podría ser apropiado.
+    c.  Sargan:
+        -   No aplicable (NA)
+        -   Interpretación: Esta prueba se usa para verificar la validez de los instrumentos cuando hay más instrumentos que variables endógenas. En este caso, con un solo instrumento (`imptv`) y una variable potencialmente endógena (`log(rprecio)`), el modelo está exactamente identificado, por lo que no se puede realizar la prueba de Sargan.
+
+Sobre el instrumento utilizado:
+
+1.  El instrumento `imptv` parece ser relevante, dado el rechazo contundente de la hipótesis de instrumentos débiles (p-valor muy pequeño).
+
+2.  No podemos concluir sobre la exogeneidad del instrumento debido a la falta de la prueba de Sargan. Esto se debe a que solo hay un instrumento para una variable potencialmente endógena.
+
+3.  La prueba de Wu-Hausman sugiere que el uso de IV podría no ser necesario, ya que no hay evidencia significativa de endogeneidad. Esto podría indicar que `imptv` no era estrictamente necesario como instrumento, y que una regresión OLS simple con `log(rprecio)` como variable independiente podría haber sido suficiente.
+
+En resumen, el modelo sugiere una relación negativa y elástica entre el precio real de los cigarrillos y la cantidad de paquetes vendidos. Aunque el instrumento `imptv` es relevante, la necesidad de usarlo es cuestionable según la prueba de Wu-Hausman. Esto plantea preguntas sobre la elección del método IV sobre OLS simple en este contexto.
+
+### Procedimiento usando el comando lm y haciendo las dos etapas
+
+```{r}
+# Asumiendo que ya tienes cargado el conjunto de datos c1995
+c1995$logrprecio <- log(c1995$rprecio)
+c1995$logpacks <- log(c1995$packs)
+```
+
+Ahora, realicemos las dos etapas del 2SLS:
+
+```{r}
+# Primera etapa: Regresa log(rprecio) sobre imptv
+stage1 <- lm(logrprecio ~ imptv, data = c1995)
+summary(stage1)
+
+# Predice log(rprecio) usando la regresión de la primera etapa
+c1995$pred_logrprecio <- predict(stage1)
+
+# Segunda etapa: Regresa log(packs) sobre el log(rprecio) predicho
+stage2 <- lm(logpacks ~ pred_logrprecio, data = c1995)
+summary(stage2)
+
+# Comparación con el modelo ivreg original
+cig_ivreg <- ivreg(log(packs) ~ log(rprecio) | imptv, data = c1995)
+summary(cig_ivreg)
+```
+
+**Interpretación de estimación manual del método de mínimos cuadrados en dos etapas (2SLS) y su comparación con el enfoque directo utilizando la función `ivreg`.**
+
+El modelo busca estimar el efecto del precio real de los cigarrillos sobre la cantidad de paquetes vendidos, utilizando `imptv` como variable instrumental.
+
+1.  Primera Etapa (OLS): `log(rprecio) ~ imptv`
+
+    -   Coeficiente de `imptv`: 0.0307 (p \< 0.001)
+    -   Interpretación: Un aumento de una unidad en `imptv` está asociado con un aumento del 3.07% en el precio real de los cigarrillos. Esta relación es altamente significativa.
+    -   R² ajustado: 0.4595, lo que indica que `imptv` explica aproximadamente el 46% de la variación en `log(rprecio)`. Este es un valor moderadamente alto, sugiriendo que `imptv` es un instrumento bastante relevante.
+    -   F-statistic: 40.96 (p \< 0.001), confirma que `imptv` es un predictor significativo de `log(rprecio)`.
+
+2.  Segunda Etapa (OLS con variable predicha): `log(packs) ~ pred_logrprecio`
+
+    -   Coeficiente de `pred_logrprecio`: -1.0836 (p = 0.006)
+    -   Interpretación: Un aumento del 1% en el precio real predicho de los cigarrillos está asociado con una disminución del 1.08% en la cantidad de paquetes vendidos. Este efecto es significativo.
+    -   R² ajustado: 0.1341, lo que sugiere que el precio real predicho explica alrededor del 13.4% de la variación en la cantidad de paquetes vendidos.
+
+3.  Modelo IV directo (ivreg): `log(packs) ~ log(rprecio) | imptv`
+
+    -   Coeficiente de `log(rprecio)`: -1.0836 (p = 0.00131)
+    -   Interpretación: Idéntica a la segunda etapa manual. Un aumento del 1% en el precio real de los cigarrillos está asociado con una disminución del 1.08% en la cantidad de paquetes vendidos.
+    -   R² ajustado: 0.3881, notablemente más alto que en la segunda etapa manual. Esta diferencia se debe a que `ivreg` calcula el R² de manera diferente, considerando la variación explicada por el instrumento.
+
+    Pruebas de diagnóstico:
+
+    a.  Instrumentos débiles: 40.956 (p \< 0.001), confirmando que `imptv` es un instrumento fuerte.
+    b.  Wu-Hausman: 0.314 (p = 0.578), sugiriendo que no hay evidencia significativa de endogeneidad en `log(rprecio)`. Esto contrasta con la evidencia marginal de endogeneidad en el modelo de tres instrumentos.
+    c.  Sargan: No aplicable, ya que solo hay un instrumento.
+
+Comparación y elección:
+
+1\. Coeficientes:
+
+-   La estimación manual y `ivreg` dan exactamente los mismos coeficientes (-1.0836), lo que confirma la correcta implementación manual del 2SLS.
+
+-   El efecto del precio sobre la demanda es ligeramente menor en magnitud que en el modelo con tres instrumentos (-1.28).
+
+2.  Errores estándar:
+    -   Son diferentes entre la segunda etapa manual (0.3766) e `ivreg` (0.3166). Esto se debe a que `ivreg` ajusta los errores para considerar la incertidumbre de la primera etapa.
+3.  R²:
+    -   `ivreg` muestra un R² ajustado mucho más alto (0.3881) que la segunda etapa manual (0.1341), debido a diferencias en el cálculo.
+4.  Relevancia del instrumento:
+    -   `imptv` es un instrumento fuerte y relevante en ambos enfoques.
+5.  Endogeneidad:
+    -   Aquí, no hay evidencia significativa de endogeneidad (Wu-Hausman p = 0.578), lo que sugiere que OLS podría ser suficiente. Sin embargo, esto contrasta con la evidencia marginal en el modelo de tres instrumentos.
+
+Dado que el modelo de tres instrumentos sugiere una posible endogeneidad y proporciona una estimación más precisa, podría ser preferible. Sin embargo, el modelo de un solo instrumento con `imptv` también es sólido. La elección final dependerá de nuestra confianza en la exogeneidad de los instrumentos adicionales y de si creemos que la evidencia de endogeneidad en el modelo más complejo es convincente. En cualquier caso, ambos modelos sugieren un efecto negativo y aproximadamente unitario del precio sobre la demanda de cigarrillos.
+
+En conclusión:
+
+-    Hemos replicado exitosamente el modelo IV utilizando regresiones OLS en dos etapas.
+
+-    Los resultados son prácticamente idénticos a los obtenidos con `ivreg`, confirmando la validez de nuestro enfoque manual.
+
+-    La única diferencia notable está en los errores estándar, que son ligeramente subestimados en nuestro método manual.
+
+-    Tanto el método manual como `ivreg` muestran un efecto negativo y elástico del precio sobre la demanda de cigarrillos.
+
+-    La primera etapa confirma que `imptv` es un instrumento relevante, aunque su poder explicativo sobre `log(rprecio)` es modesto.
+
+Aunque ambos métodos son válidos, `ivreg` es preferible en la práctica porque corrige automáticamente los errores estándar y proporciona pruebas de diagnóstico útiles como Wu-Hausman.
+
+```{r}
+# Estimación con IVREG II CASO con dos instrumentos
+
+# incorporamos el ingreso real al dataset 
+CigarettesSW$rincome <- with(CigarettesSW, income / population / cpi)
+
+c1995 <- subset(CigarettesSW, year == "1995")
+```
+
+```{r}
+# estimamos el modelo con un unico instrumento
+cig_ivreg2 <- ivreg(log(packs) ~ log(rprecio) + log(rincome) |  imptv+ log(rincome)
+                    , data = c1995)
+
+coeftest(cig_ivreg2, vcov = vcovHC, type = "HC1")
+summary(cig_ivreg2)
+```
+
+**Interpretación de los resultados anteriores:**\
+Regresión de variables instrumentales (IV) utilizando el método de mínimos cuadrados en dos etapas (2SLS). La variable dependiente es el logaritmo de la cantidad de paquetes de cigarrillos vendidos (`log(packs)`). Las variables independientes son el logaritmo del precio real de los cigarrillos (`log(rprecio)`) y el logaritmo del ingreso real (`log(rincome)`). La variable `imptv` se utiliza como instrumento para `log(rprecio)`, mientras que `log(rincome)` se trata como exógena.
+
+*Observaciones principales:*
+
+1.  Coeficientes:
+
+    -   Intercepto: 9.4307 (significativo al 0.1%)
+    -   `log(rprecio)`: -1.1434 (significativo al 1%)
+    -   `log(rincome)`: 0.2145 (no significativo, p-valor = 0.495)
+
+    Interpretación:
+
+    -   Un aumento del 1% en el precio real de los cigarrillos está asociado con una disminución del 1.14% en la cantidad de paquetes vendidos, manteniendo otros factores constantes. Esta relación es estadísticamente significativa.
+    -   Aunque el coeficiente del ingreso real sugiere que un aumento del 1% en el ingreso está asociado con un aumento del 0.21% en la cantidad de paquetes vendidos, este efecto no es estadísticamente significativo.
+
+2.  Errores estándar:
+
+    -   Se utilizaron errores estándar robustos (HC1) para corregir posibles problemas de heterocedasticidad. Los errores estándar robustos son ligeramente diferentes a los no robustos, pero no cambian las conclusiones generales.
+
+3.  Bondad del ajuste:
+
+    -   R² ajustado: 0.3931
+    -   Error estándar residual: 0.1896
+
+    Interpretación: El modelo explica aproximadamente el 39.31% de la variabilidad en la cantidad de paquetes vendidos. El error estándar residual sugiere que, en promedio, las predicciones se desvían en un 18.96% de los valores reales.
+
+4.  Pruebas de diagnóstico:
+
+    a.  Instrumentos débiles:
+        -   Estadístico: 45.158 (p-valor \< 0.001)
+        -   Interpretación: Se rechaza fuertemente la hipótesis nula de que el instrumento es débil. Esto sugiere que `imptv` es un buen instrumento para `log(rprecio)`, ya que está fuertemente correlacionado con esta variable.
+    b.  Wu-Hausman:
+        -   Estadístico: 1.102 (p-valor = 0.3)
+        -   Interpretación: No se rechaza la hipótesis nula. Esto sugiere que no hay evidencia significativa de endogeneidad en `log(rprecio)`. Tratar `log(rprecio)` como exógeno en una regresión OLS simple podría ser apropiado.
+    c.  Sargan:
+        -   No aplicable (NA)
+        -   Interpretación: Con un solo instrumento (`imptv`) para una variable potencialmente endógena (`log(rprecio)`), el modelo está exactamente identificado, por lo que no se puede realizar la prueba de Sargan.
+
+Sobre el instrumento utilizado (`imptv`):
+
+1.  Relevancia: El instrumento es muy relevante, dado el rechazo contundente de la hipótesis de instrumentos débiles (p-valor muy pequeño, 2.65e-08). Esto indica una fuerte correlación entre `imptv` y `log(rprecio)` en la primera etapa de la regresión 2SLS.
+
+2.  Exogeneidad: No podemos concluir sobre la exogeneidad del instrumento debido a la falta de la prueba de Sargan. Esta prueba requiere más instrumentos que variables endógenas, lo cual no es el caso aquí.
+
+3.  Necesidad: La prueba de Wu-Hausman sugiere que el uso de IV podría no ser necesario. Con un p-valor de 0.3, no hay evidencia significativa de endogeneidad en `log(rprecio)`. Esto implica que `imptv`, aunque relevante, podría no ser estrictamente necesario, y que una regresión OLS simple con `log(rprecio)` como variable independiente podría haber sido suficiente.
+
+4.  Utilidad: A pesar de la posible no necesidad según Wu-Hausman, el uso de `imptv` como instrumento ha permitido estimar el efecto causal del precio sobre la demanda, controlando por posibles problemas de endogeneidad que, aunque no evidentes en la prueba, podrían estar presentes.
+
+En resumen, el modelo muestra una relación negativa y elástica entre el precio real de los cigarrillos y la cantidad de paquetes vendidos, sin un efecto significativo del ingreso. El instrumento `imptv` es muy relevante, pero su necesidad es cuestionable según la prueba de Wu-Hausman. Esto plantea preguntas sobre la elección del método IV sobre OLS simple, aunque el enfoque IV ofrece una estimación más robusta frente a posibles problemas de endogeneidad no detectados.
+
+```{r}
+# Agregamos un segundo instrumento y estimamos el modelo
+
+# adicionamos el impuestos locales a los cigarrilos al  
+CigarettesSW$cigtax <- with(CigarettesSW, tax/cpi)
+
+c1995 <- subset(CigarettesSW, year == "1995")
+# estimate the model
+cig_ivreg3 <- ivreg(log(packs) ~ log(rprecio) + log(rincome) | 
+                      log(rincome) + imptv + cigtax, data = c1995)
+
+coeftest(cig_ivreg3, vcov = vcovHC, type = "HC1")
+summary(cig_ivreg3)
+```
+
+**Interpretación de la salida de una regresión de variables instrumentales (IV) utilizando el método de mínimos cuadrados en dos etapas (2SLS).**
+
+La variable dependiente es el logaritmo de la cantidad de paquetes de cigarrillos vendidos (`log(packs)`). Las variables independientes son el logaritmo del precio real de los cigarrillos (`log(rprecio)`) y el logaritmo del ingreso real (`log(rincome)`).
+
+En este modelo, se utilizan tres instrumentos: `log(rincome)`, `imptv` y `cigtax` para la variable potencialmente endógena `log(rprecio)`.
+
+Observaciones principales:
+
+1.  Coeficientes:
+
+    -   Intercepto: 9.8950 (significativo al 0.1%)
+    -   `log(rprecio)`: -1.2774 (significativo al 0.1%)
+    -   `log(rincome)`: 0.2804 (no significativo, p-valor = 0.2753)
+
+    Interpretación:
+
+    -   Un aumento del 1% en el precio real de los cigarrillos está asociado con una disminución del 1.28% en la cantidad de paquetes vendidos, manteniendo otros factores constantes. Esta relación es altamente significativa.
+    -   Aunque el coeficiente del ingreso real sugiere que un aumento del 1% en el ingreso está asociado con un aumento del 0.28% en la cantidad de paquetes vendidos, este efecto no es estadísticamente significativo.
+
+2.  Bondad del ajuste:
+
+    -   R² ajustado: 0.4041
+    -   Error estándar residual: 0.1879
+
+    Interpretación: El modelo explica aproximadamente el 40.41% de la variabilidad en la cantidad de paquetes vendidos. El error estándar residual sugiere que, en promedio, las predicciones se desvían en un 18.79% de los valores reales.
+
+3.  Pruebas de diagnóstico:
+
+    a.  Instrumentos débiles:
+        -   Estadístico: 244.734 (p-valor \< 2e-16)
+        -   Interpretación: Se rechaza contundentemente la hipótesis nula de que los instrumentos son débiles. Esto sugiere que `log(rincome)`, `imptv` y `cigtax` son instrumentos muy fuertes para `log(rprecio)`, con una correlación muy alta en la primera etapa.
+    b.  Wu-Hausman:
+        -   Estadístico: 3.068 (p-valor = 0.0868)
+        -   Interpretación: Hay evidencia marginalmente significativa (al nivel del 10%) de endogeneidad en `log(rprecio)`. Esto sugiere que el uso de IV es preferible a OLS, aunque la evidencia no es muy fuerte.
+    c.  Sargan:
+        -   Estadístico: 0.333 (p-valor = 0.5641)
+        -   Interpretación: No se rechaza la hipótesis nula. Esto sugiere que los instrumentos son válidos, es decir, no están correlacionados con el término de error en la ecuación principal. La prueba de Sargan es posible aquí porque hay más instrumentos (3) que variables endógenas (1).
+
+Sobre los instrumentos utilizados:
+
+1.  Relevancia: Los tres instrumentos (`log(rincome)`, `imptv` y `cigtax`) son extremadamente relevantes, como lo indica el estadístico de instrumentos débiles de 244.734 (p-valor \< 2e-16). Esta es una evidencia muy fuerte de que los instrumentos están altamente correlacionados con `log(rprecio)`.
+
+2.  Exogeneidad: La prueba de Sargan (p-valor = 0.5641) sugiere que los instrumentos son exógenos, es decir, no están correlacionados con el término de error. Esto apoya la validez de los instrumentos.
+
+3.  Necesidad: La prueba de Wu-Hausman (p-valor = 0.0868) indica una evidencia débil de endogeneidad en `log(rprecio)`. Aunque no es una evidencia muy fuerte (solo significativa al 10%), sugiere que el uso de IV es preferible a OLS.
+
+¿Qué modelo elegir, con uno o dos instrumentos? Recomiendo elegir el modelo con tres instrumentos (`log(rincome)`, `imptv` y `cigtax`) por las siguientes razones:
+
+1.  Mayor precisión: El error estándar de `log(rprecio)` es considerablemente menor en este modelo (0.24961) en comparación con el modelo de un solo instrumento (0.37230) y el de dos instrumentos (0.3595). Esto indica una estimación más precisa del efecto del precio.
+
+2.  Instrumentos más fuertes: El estadístico de instrumentos débiles es mucho mayor en este modelo (244.734) que en los anteriores (40.956 y 45.158), lo que sugiere que los tres instrumentos juntos son mucho más fuertes.
+
+3.  Validez de los instrumentos: La prueba de Sargan (no disponible en los modelos anteriores) respalda la validez de los instrumentos, lo que aumenta la confianza en las estimaciones.
+
+4.  Evidencia de endogeneidad: Aunque no es muy fuerte, hay evidencia marginal de endogeneidad (Wu-Hausman p-valor = 0.0868), lo que favorece el uso de IV sobre OLS.
+
+5.  Mejor ajuste: Este modelo tiene un R² ajustado ligeramente mayor (0.4041) que los anteriores (0.3881 y 0.3931), indicando un mejor ajuste global.
+
+En resumen, el modelo con tres instrumentos proporciona una estimación más precisa y confiable del efecto del precio sobre la demanda de cigarrillos. La evidencia sugiere que un aumento del 1% en el precio real de los cigarrillos lleva a una disminución del 1.28% en la cantidad de paquetes vendidos, un efecto elástico y altamente significativo.
+
+## MODELOS PROBIT, LOGIT Y OLS
+
+```{r}
+#install.packages("MASS")
+#install.packages("lmtest")
+#install.packages("sandwich")
+#install.packages("betareg")
+#install.packages("mfx")
+library(MASS) # necesario para que funcione mfx
+library(betareg)  # necesario para que funcione mfx
+library(mfx) # para usa el ejemplo
+library(AER)
+data("SwissLabor")
+head(SwissLabor)
+```
+
+### Modelo PROBIT con glm
+
+```{r}
+probit1<-glm(participation ~ income + age + education +youngkids + oldkids + foreign,
+    family = binomial(link = "probit"), 
+    data = SwissLabor)
+
+coeftest(probit1, vcov. = vcovHC, type = "HC1") # existe discusión al respecto si corregir los errores
+
+```
+
+Interpretación:
+
+Estamos regresando un modelo Probit, que es un tipo de modelo de elección binaria. En este caso, se está modelando la decisión de participación laboral de las mujeres utilizando datos de Suiza (SwissLabor). La variable dependiente es `participation`, que probablemente es una variable binaria que toma el valor 1 si la mujer participa en la fuerza laboral y 0 si no.
+
+El modelo utiliza varias características personales y familiares como variables independientes para predecir la probabilidad de que una mujer participe en la fuerza laboral. Veamos qué nos dicen los resultados:
+
+1.  Ingresos (`income`): Tiene un coeficiente negativo (-0.502) y es altamente significativo (p \< 0.001). Esto sugiere que, a medida que aumentan los ingresos de la familia, la probabilidad de que una mujer participe en la fuerza laboral disminuye. Esto podría indicar que en hogares con mayores ingresos (tal vez debido a un cónyuge con un buen salario), las mujeres tienen menos presión económica para trabajar.
+
+2.  Edad (`age`): También tiene un coeficiente negativo (-0.311) y es muy significativo (p \< 0.001). Esto indica que a medida que las mujeres envejecen, tienen menos probabilidades de participar en la fuerza laboral. Esto podría reflejar varios factores, como la jubilación anticipada, problemas de salud, o el hecho de que las generaciones mayores podrían tener valores más tradicionales sobre el trabajo femenino.
+
+3.  Educación (`education`): Tiene un coeficiente positivo (0.020), pero no es estadísticamente significativo (p = 0.244). Aunque el signo sugiere que más educación podría aumentar ligeramente la probabilidad de participación laboral (lo cual es intuitivo), la falta de significancia estadística implica que no podemos estar seguros de este efecto en esta muestra.
+
+4.  Niños pequeños (`youngkids`): Tiene un coeficiente negativo muy grande (-0.785) y es altamente significativo (p \< 0.001). Esto muestra que tener niños pequeños reduce drásticamente la probabilidad de que una mujer trabaje. Este es un hallazgo común en muchos países, ya que el cuidado infantil a menudo recae en las madres, especialmente cuando los niños son pequeños.
+
+5.  Niños mayores (`oldkids`): Tiene un coeficiente negativo muy pequeño (-0.013) y no es significativo (p = 0.760). A diferencia de tener niños pequeños, tener niños mayores no parece afectar la decisión de trabajar de una mujer. Esto tiene sentido, ya que los niños mayores requieren menos cuidado intensivo.
+
+6.  Ser extranjera (`foreignyes`): Sorprendentemente, tiene un coeficiente positivo grande (0.804) y es altamente significativo (p \< 0.001). Esto indica que las mujeres extranjeras en Suiza tienen una probabilidad mucho mayor de participar en la fuerza laboral que las mujeres suizas. Esto podría deberse a varios factores, como la necesidad económica, diferentes normas culturales sobre el trabajo femenino, o quizás el tipo de inmigrantes que Suiza atrae (por ejemplo, profesionales altamente calificadas).
+
+En resumen, este modelo Probit revela patrones interesantes en la participación laboral de las mujeres en Suiza:
+
+-   Factores que reducen significativamente la probabilidad de trabajar: tener niños pequeños, tener mayores ingresos familiares, y ser de mayor edad.
+
+-   Factores que aumentan significativamente la probabilidad de trabajar: ser extranjera.
+
+-   Factores sin efecto claro: nivel educativo y tener niños mayores.
+
+Estos resultados sugieren que las decisiones de las mujeres sobre participar en la fuerza laboral están fuertemente influenciadas por sus circunstancias familiares (especialmente la presencia de niños pequeños) y su estatus socioeconómico. También revelan diferencias culturales o económicas significativas entre las mujeres suizas y extranjeras. Estos hallazgos podrían tener implicaciones importantes para las políticas de empleo, como la necesidad de mejor acceso a cuidado infantil asequible o esfuerzos para cambiar las normas culturales sobre el trabajo femenino.
+
+### Modelo PROBIT con mfx
+
+```{r}
+probit2<-probitmfx(participation ~ income + age + education + youngkids + oldkids + foreign, data = SwissLabor)
+probit2$fit
+probit2 # Nos da los efectos marginales
+```
+
+Interpretación:
+
+Los resultados presentados corresponden a la misma regresión Probit que vimos antes, pero esta vez se muestran los efectos marginales. En un modelo Probit, los coeficientes por sí solos no son fácilmente interpretables en términos de magnitud, ya que representan el efecto sobre una función (el inverso de la distribución normal acumulativa) de la probabilidad. Por eso, es común calcular los efectos marginales, que nos dicen cuánto cambia la probabilidad de participación laboral cuando cambia cada variable independiente.
+
+Primero, veamos el ajuste del modelo:
+
+\- Deviance nula: 1203 (mide qué tan bien un modelo con solo el intercepto se ajusta a los datos) - Deviance residual: 1053 (mide qué tan bien se ajusta nuestro modelo)
+
+\- AIC: 1067 (una métrica que equilibra el ajuste del modelo con su complejidad; valores más bajos indican un mejor modelo)
+
+La disminución de la deviance de 1203 a 1053 sugiere que nuestras variables independientes mejoran significativamente el ajuste del modelo en comparación con un modelo que solo tiene un intercepto.
+
+Ahora, veamos los efectos marginales:
+
+1.  Ingresos (`income`): Un aumento en los ingresos familiares disminuye la probabilidad de que una mujer trabaje en 19.92 puntos porcentuales. Este es un efecto grande y altamente significativo (p \< 0.001). Por ejemplo, si una familia pasa de tener ingresos bajos a medios, la probabilidad de que la mujer trabaje podría caer de, digamos, 70% a 50%.
+
+2.  Edad (`age`): Por cada año adicional de edad, la probabilidad de que una mujer trabaje disminuye en 12.32 puntos porcentuales. Este también es un efecto grande y muy significativo (p \< 0.001). Sugiere que a medida que las mujeres envejecen, se retiran progresivamente de la fuerza laboral.
+
+3.  Educación (`education`): Cada año adicional de educación aumenta la probabilidad de trabajar en solo 0.81 puntos porcentuales. Además de ser pequeño, este efecto no es estadísticamente significativo (p = 0.244). Aunque esperaríamos que más educación aumentara sustancialmente la participación laboral, en esta muestra no vemos evidencia clara de ello.
+
+4.  Niños pequeños (`youngkids`): Tener niños pequeños disminuye la probabilidad de que una mujer trabaje en 31.10 puntos porcentuales. Este es el efecto más grande de todas las variables y es altamente significativo (p \< 0.001). Muestra el impacto dramático que tiene la maternidad temprana en las decisiones laborales de las mujeres. Por ejemplo, una mujer que antes de tener hijos tenía un 80% de probabilidad de trabajar, después de tener un niño pequeño, esa probabilidad podría caer a cerca del 50%.
+
+5.  Niños mayores (`oldkids`): Tener niños mayores reduce la probabilidad de trabajar en solo 0.53 puntos porcentuales, un efecto mínimo que no es estadísticamente significativo (p = 0.764). Esto confirma que, a diferencia de los niños pequeños, los niños mayores tienen poco impacto en las decisiones laborales de las mujeres.
+
+6.  Ser extranjera (`foreignyes`): Ser una mujer extranjera en Suiza aumenta la probabilidad de trabajar en 31.12 puntos porcentuales. Este efecto es tan grande como el de tener niños pequeños, pero en la dirección opuesta, y es altamente significativo (p \< 0.001). Indica una diferencia sustancial entre las mujeres suizas y extranjeras. Por ejemplo, si una mujer suiza tiene un 40% de probabilidad de trabajar, una mujer extranjera en circunstancias similares tendría alrededor de un 70% de probabilidad.
+
+En resumen, estos efectos marginales cuantifican de manera clara y directa cómo diferentes factores afectan la probabilidad de que una mujer en Suiza participe en la fuerza laboral:
+
+-   Tener niños pequeños y ser extranjera son los factores más impactantes, cada uno cambiando la probabilidad en más de 30 puntos porcentuales, pero en direcciones opuestas.
+-   La edad y los ingresos familiares también tienen efectos sustanciales, ambos reduciendo la probabilidad de trabajar.
+-   Sorprendentemente, la educación y tener niños mayores tienen efectos mínimos y no significativos.
+
+Estos resultados sugieren que la participación laboral de las mujeres en Suiza está fuertemente determinada por factores familiares y demográficos, más que por el capital humano (como la educación). Políticas como mejorar el acceso al cuidado infantil podrían tener un impacto significativo, dado el gran efecto negativo de tener niños pequeños. También sería interesante investigar por qué las mujeres extranjeras tienen una probabilidad mucho mayor de trabajar: ¿es por necesidad económica, diferentes valores culturales, o tal vez porque Suiza atrae a inmigrantes altamente calificadas?
+
+#### Diferencias y similitudes entre los dos modelos
+
+```         
+probit1 <- glm(participation ~ income + age + education + youngkids + oldkids + foreign, 
+              family = binomial(link = "probit"), data = SwissLabor)
+
+probit2 <- probitmfx(participation ~ income + age + education + youngkids + oldkids + foreign, 
+                   data = SwissLabor)
+```
+
+En realidad, `probit1` y `probit2` son esencialmente el mismo modelo Probit, pero presentado de dos maneras diferentes. Ambos modelos están estimando la probabilidad de que una mujer participe en la fuerza laboral en función de las mismas variables independientes: ingresos, edad, educación, presencia de niños pequeños, presencia de niños mayores, y si la mujer es extranjera.
+
+**Similitudes**:
+
+1.  Especificación del modelo:
+    -   Ambos usan exactamente las mismas variables independientes.
+    -   Ambos usan la misma variable dependiente binaria (`participation`).
+    -   Ambos utilizan un enlace Probit, que asume que la función de distribución acumulativa (CDF) normal determina la relación entre las variables independientes y la probabilidad de participación.
+2.  Datos:
+    -   Ambos modelos usan el mismo conjunto de datos, `SwissLabor`.
+3.  Signos y significancia:
+    -   En ambos modelos, los signos de los coeficientes son idénticos:
+        -   Negativos para `income`, `age`, `youngkids`, `oldkids`
+        -   Positivos para `education` y `foreignyes`
+    -   La significancia estadística es idéntica en ambos modelos:
+        -   Altamente significativos (p \< 0.001): `income`, `age`, `youngkids`, `foreignyes`
+        -   No significativos: `education` (p ≈ 0.24), `oldkids` (p \> 0.75)
+4.  Interpretación cualitativa:
+    -   Ambos modelos llevan a las mismas conclusiones cualitativas:
+        -   Tener niños pequeños y ser de mayor edad reducen fuertemente la probabilidad de trabajar.
+        -   Mayores ingresos familiares también reducen esta probabilidad.
+        -   Ser extranjera aumenta sustancialmente la probabilidad.
+        -   La educación y tener niños mayores tienen poco o ningún efecto.
+
+**Diferencias**:
+
+1.  Función y paquete:
+    -   `probit1` usa la función `glm()` del paquete base de R.
+    -   `probit2` usa la función `probitmfx()`, que probablemente es de un paquete adicional diseñado para modelos de elección discreta.
+2.  Salida y enfoque:
+    -   `probit1` presenta los coeficientes del modelo Probit.
+        -   Estos coeficientes muestran el efecto de cada variable sobre el inverso de la CDF normal de la probabilidad.
+        -   Son útiles para ver la dirección y significancia del efecto, pero su magnitud no es fácilmente interpretable.
+    -   `probit2` presenta los efectos marginales.
+        -   Estos muestran cuánto cambia la probabilidad de participación cuando cambia cada variable independiente.
+        -   Son más interpretables en términos de magnitud, ya que están en la escala de probabilidad (0-100%).
+3.  Interpretación cuantitativa:
+    -   En `probit1`, un coeficiente de -0.785 para `youngkids` indica un fuerte efecto negativo, pero no podemos decir cuánto cambia la probabilidad.
+    -   En `probit2`, el efecto marginal de -0.311 para `youngkids` nos dice que tener niños pequeños reduce la probabilidad de trabajar en 31.1 puntos porcentuales.
+4.  Información adicional:
+    -   `probit1` proporciona más detalles sobre el ajuste del modelo:
+        -   Error estándar residual, R² múltiple, prueba de Wald
+    -   `probit2` se enfoca más en la interpretabilidad:
+        -   Presenta errores estándar para los efectos marginales
+        -   Note que `foreignyes` es una variable discreta, lo que afecta cómo se calcula su efecto marginal
+5.  Métricas de ajuste:
+    -   `probit1` no muestra métricas de ajuste como AIC o deviance.
+    -   `probit2` muestra:
+        -   Deviance nula (1203) y residual (1053), indicando una mejora en el ajuste.
+        -   AIC (1067), útil para comparar con otros modelos.
+
+En resumen, `probit1` y `probit2` son el mismo modelo Probit, pero presentado de dos maneras que se complementan:
+
+-   `probit1` se enfoca en la significancia estadística y la dirección de los efectos.
+
+-   `probit2` se enfoca en la magnitud de los efectos en términos de probabilidades.
+
+Ambos llevan a las mismas conclusiones cualitativas sobre qué factores influyen en la participación laboral de las mujeres en Suiza. Sin embargo, `probit2` va un paso más allá al cuantificar estos efectos en términos fácilmente interpretables. Por ejemplo, nos dice que ser extranjera o tener niños pequeños cambia la probabilidad de trabajar en más de 30 puntos porcentuales, en direcciones opuestas.
+
+Esta combinación de enfoques es poderosa: `probit1` nos da confianza en la robustez estadística de los efectos, mientras que `probit2` nos ayuda a entender su importancia práctica. Juntos, proporcionan una comprensión más completa de los factores que influyen en las decisiones laborales de las mujeres en Suiza.
+
+### Modelo LOGIT con glm
+
+```{r}
+logit1<-glm(participation ~ income + age + education +youngkids + oldkids + foreign,family = binomial(link = "logit"), data = SwissLabor)
+
+coeftest(logit1, vcov. = vcovHC, type = "HC1") # existe discusión al respecto si corregir los errores
+
+```
+
+Interpretación de resultados de la salida del modelo Logit estimado:
+
+```         
+logit1 <- glm(participation ~ income + age + education + youngkids + oldkids + foreign,
+             family = binomial(link = "logit"), data = SwissLabor)
+coeftest(logit1, vcov. = vcovHC, type = "HC1")
+```
+
+Este es un modelo Logit que, al igual que el modelo Probit que vimos antes, se utiliza para modelar la probabilidad de un evento binario, en este caso, la participación de las mujeres en la fuerza laboral en Suiza. **La principal diferencia** entre Logit y Probit **es la función de enlace**: Logit usa la función logística, mientras que Probit usa la función de distribución acumulativa normal.
+
+Además, **se ha aplicado una corrección a los errores estándar** utilizando la opción `vcovHC` con `type = "HC1"`. Esta es una **práctica común en modelos de elección discreta** para abordar posibles problemas de heterocedasticidad. La heterocedasticidad en estos modelos puede ocurrir porque la varianza del término de error depende de la probabilidad predicha, que a su vez depende de las variables independientes.
+
+Interpretación de los coeficientes:
+
+1.  Ingresos (`income`): -0.815 (p \< 0.001)
+    -   Un aumento en los ingresos familiares reduce significativamente la probabilidad de que una mujer trabaje.
+    -   En términos de odds: Por cada unidad de aumento en el ingreso, las odds de que una mujer trabaje se multiplican por e⁻⁰.⁸¹⁵ ≈ 0.443, es decir, se reducen en un 55.7%.
+2.  Edad (`age`): -0.510 (p \< 0.001)
+    -   A medida que las mujeres envejecen, su probabilidad de trabajar disminuye significativamente.
+    -   Odds: Por cada año adicional, las odds de trabajar se multiplican por e⁻⁰.⁵¹⁰ ≈ 0.600, una reducción del 40%.
+3.  Educación (`education`): 0.032 (p = 0.277)
+    -   Aunque el coeficiente es positivo, sugiriendo que más educación podría aumentar ligeramente la probabilidad de trabajar, el efecto no es estadísticamente significativo.
+    -   No podemos concluir que la educación afecte la decisión de trabajar en esta muestra.
+4.  Niños pequeños (`youngkids`): -1.331 (p \< 0.001)
+    -   Tener niños pequeños reduce drásticamente la probabilidad de que una mujer trabaje.
+    -   Odds: Las odds de trabajar para una mujer con niños pequeños son e⁻¹.³³¹ ≈ 0.264 veces las odds de una mujer sin niños pequeños, una reducción del 73.6%.
+5.  Niños mayores (`oldkids`): -0.022 (p = 0.763)
+    -   El efecto de tener niños mayores es prácticamente nulo y no es estadísticamente significativo.
+    -   Esto confirma que, a diferencia de los niños pequeños, los niños mayores no influyen en la decisión de trabajar de una mujer.
+6.  Ser extranjera (`foreignyes`): 1.310 (p \< 0.001)
+    -   Ser una mujer extranjera en Suiza aumenta significativamente la probabilidad de trabajar.
+    -   Odds: Las odds de trabajar para una mujer extranjera son e¹.³¹⁰ ≈ 3.707 veces las odds de una mujer suiza, un aumento del 270.7%.
+7.  Intercepto: 10.374 (p \< 0.001)
+    -   En un modelo Logit, el intercepto representa el logaritmo de las odds de participación cuando todas las variables independientes son cero.
+    -   Aquí, representa las odds de participación para una mujer suiza hipotética con cero ingresos, cero años de edad, cero años de educación y sin hijos. Claramente, esto está fuera del rango de datos observados y no tiene una interpretación práctica.
+
+Comparación con el modelo Probit:
+
+\- Los signos y significancias estadísticas son idénticos a los del modelo Probit, lo que refuerza la robustez de los hallazgos.
+
+\- Las magnitudes de los coeficientes son diferentes debido a las diferentes escalas de las funciones logística y normal.
+
+\- En el Probit, los efectos marginales se interpretaban directamente como cambios en la probabilidad. En el Logit, los coeficientes se interpretan en términos de odds, que son más complejos pero aún informativos.
+
+*Conclusiones:*
+
+1.  La corrección HC1 para los errores estándar sugiere una preocupación por la heterocedasticidad, pero los resultados siguen siendo altamente significativos.
+2.  Los factores que más influyen en la participación laboral de las mujeres son:
+    -   Tener niños pequeños (gran efecto negativo)
+    -   Ser extranjera (gran efecto positivo)
+    -   Edad e ingresos familiares (efectos negativos sustanciales)
+3.  La educación y tener niños mayores no parecen influir significativamente.
+4.  La consistencia entre los modelos Logit y Probit aumenta la confianza en estos hallazgos.
+
+Este análisis refuerza las conclusiones anteriores sobre los factores que influyen en la participación laboral de las mujeres en Suiza, destacando la importancia de las circunstancias familiares y el estatus de inmigrante. La magnitud de estos efectos, especialmente en términos de odds, subraya la necesidad de políticas que aborden estas disparidades.
+
+### Modelo LOGIT con mfx
+
+```{r}
+logit2<-logitmfx(participation ~ income + age + education + youngkids + oldkids + foreign, data = SwissLabor)
+logit2$fit
+logit2 # Nos da los efectos marginales
+```
+
+Interpretación de la salida del modelo Logit con efectos marginales:
+
+```         
+logit2 <- logitmfx(participation ~ income + age + education + youngkids + oldkids + foreign, data = SwissLabor)
+logit2$fit
+logit2 # Nos da los efectos marginales
+```
+
+Este es el mismo modelo Logit que analizamos anteriormente, pero ahora presentado de una manera que facilita la interpretación. La función `logitmfx` calcula y presenta los efectos marginales, que nos dicen cuánto cambia la probabilidad de participación laboral cuando cambia cada variable independiente.
+
+Primero, veamos el ajuste del modelo:
+
+-   Deviance nula: 1203 (mide qué tan bien un modelo con solo el intercepto se ajusta a los datos)
+
+-   Deviance residual: 1053 (mide qué tan bien se ajusta nuestro modelo)
+
+-   AIC: 1067 (una métrica que equilibra el ajuste del modelo con su complejidad)
+
+La disminución de la deviance de 1203 a 1053 indica que nuestras variables independientes mejoran significativamente el ajuste del modelo en comparación con un modelo que solo tiene un intercepto. Este es exactamente el mismo ajuste que vimos en el modelo Probit, lo que no es sorprendente ya que ambos modelos usan las mismas variables y datos.
+
+Ahora, interpretemos los efectos marginales:
+
+1.  Ingresos (`income`): -0.2019 (p \< 0.001)
+    -   Un aumento en una unidad en los ingresos familiares reduce la probabilidad de que una mujer trabaje en 20.19 puntos porcentuales.
+    -   Este es un efecto sustancial y altamente significativo.
+2.  Edad (`age`): -0.1264 (p \< 0.001)
+    -   Por cada año adicional de edad, la probabilidad de que una mujer trabaje disminuye en 12.64 puntos porcentuales.
+    -   Este efecto acumulativo de la edad es muy significativo y muestra cómo las mujeres se retiran gradualmente de la fuerza laboral a medida que envejecen.
+3.  Educación (`education`): 0.0079 (p = 0.275)
+    -   Cada año adicional de educación aumenta la probabilidad de trabajar en solo 0.79 puntos porcentuales.
+    -   Este efecto es muy pequeño y no es estadísticamente significativo, sugiriendo que, en esta muestra, la educación no influye notablemente en la decisión de trabajar.
+4.  Niños pequeños (`youngkids`): -0.3297 (p \< 0.001)
+    -   Tener niños pequeños reduce la probabilidad de que una mujer trabaje en 32.97 puntos porcentuales.
+    -   Este es el efecto más grande y más significativo, resaltando el impacto dramático que tiene la maternidad temprana en las decisiones laborales de las mujeres.
+5.  Niños mayores (`oldkids`): -0.0054 (p = 0.766)
+    -   Tener niños mayores reduce la probabilidad de trabajar en solo 0.54 puntos porcentuales.
+    -   Este efecto es prácticamente nulo y no es estadísticamente significativo, confirmando que los niños mayores no influyen en la decisión de trabajar de una mujer.
+6.  Ser extranjera (`foreignyes`): 0.3150 (p \< 0.001)
+    -   Ser una mujer extranjera en Suiza aumenta la probabilidad de trabajar en 31.50 puntos porcentuales.
+    -   Este efecto es casi tan grande como el de tener niños pequeños, pero en la dirección opuesta. Es altamente significativo.
+
+Comparación con el modelo Probit:
+
+Los efectos marginales del modelo Logit son notablemente similares a los del modelo Probit:
+
+1.  \- Niños pequeños: -32.97% (Logit) vs -31.10% (Probit)
+
+2.  \- Ser extranjera: +31.50% (Logit) vs +31.12% (Probit)
+
+3.  \- Edad (por año): -12.64% (Logit) vs -12.32% (Probit)
+
+4.  \- Ingresos (por unidad): -20.19% (Logit) vs -19.92% (Probit)
+
+-   Esta similitud no es sorprendente. Aunque Logit y Probit usan funciones de enlace diferentes (logística vs normal acumulativa), tienden a producir efectos marginales muy similares en la práctica. Las diferencias suelen ser más notables en las colas de la distribución.
+
+-   La consistencia entre ambos modelos aumenta enormemente nuestra confianza en los hallazgos. Dos enfoques diferentes conducen a conclusiones prácticamente idénticas.
+
+*Conclusiones*:
+
+-   Tener niños pequeños y ser extranjera son los factores más impactantes, cada uno cambiando la probabilidad de trabajar en más de 30 puntos porcentuales, pero en direcciones opuestas.
+-   La edad y los ingresos familiares también tienen efectos sustanciales, reduciendo la probabilidad de trabajo.
+-   La educación y tener niños mayores tienen efectos negligibles.
+-   La consistencia entre los modelos Logit y Probit refuerza la robustez de estos hallazgos.
+
+Estas estimaciones de efectos marginales son invaluables para los responsables políticos. Por ejemplo, sugieren que políticas que faciliten el cuidado infantil podrían aumentar la participación laboral femenina en más de 30 puntos porcentuales. También plantean preguntas interesantes sobre por qué las mujeres extranjeras tienen una probabilidad mucho mayor de trabajar, lo que podría informar políticas de integración y empleo.
