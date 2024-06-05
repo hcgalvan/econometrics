@@ -1,0 +1,71 @@
+library(readxl)
+library(readxl)
+ventas <- read_excel("class-5/Datos para ARIMA.xlsx", 
+                               sheet = "ventas")
+View(ventas)
+#ventas <- read_excel("~/Desktop/Universidad/ECONOMETRIA 2020-2023/series de tiempo econometria/ventas.xlsx")
+library(forecast)
+library(datasets)
+library(stats)
+library(ggplot2)
+library(tseries)
+library(lmtest)
+### ARIMA################
+#Suponemos ventas mensuales
+#Chequeamos estructura de los datos, modificamos a df y luego en series
+str(ventas)
+ventasdf<-data.frame(ventas)
+str(ventasdf)
+is.ts(ventasdf)
+tsventas= ts(ventasdf, start = c(1980,1), frequency = 12)
+is.ts(tsventas)
+head(tsventas)
+### GRAFICO DE LA SERIE, AFC Y PACF############
+### recordar lo de ruido blanco
+plot.ts(tsventas) 
+### preguntas
+#que observa?
+#### componentes de la serie ADITIVO###
+componentes <- decompose(tsventas)
+plot(componentes)
+#### componentes de la serie MULTIPLICATIVO###
+
+
+#### graficamos acf y pacf ##
+par1<-par(mfrow=c(1,2))
+acf(tsventas, main=" Ventas mensuales. ACF", lag.max=20)
+pacf(tsventas, main="Ventas mensuales. PACF", lag.max=20)
+par(par1)
+### test aumentado de dickey fuller ###
+adf.test(tsventas)## nos da que la serie es no estacionaria (cual es la ho?) por ende debemos transfromarla.
+kpss.test(tsventas) ### Ho?
+##### Diferenciacion para ver si es estacionaria####
+adf.test(diff(tsventas)) 
+### otra alternativa para observar cuanto necesitamos diferenciar en nivel###
+ndiffs(tsventas, test = "adf") ## nos dice que se necesita una diferencia para sea estacionaria.
+### En caso de diferenciar mas veces###
+dif1tsventas<-diff(tsventas)
+dif2tsventas<-diff(dif1tsventas)
+adf.test(dif2tsventas) ## rechazamos la ho de no estacionariedad
+kpss.test(diff(dif2tsventas))#aceptamos la ho de estacionariedad.
+
+### graficamos los acf y pacf de la serie diferenciada #####
+par(mfrow=c(1,2))
+acf(dif1tsventas, main=" Ventas mensuales diferenciadas. ACF", lag.max=20)
+pacf(dif1tsventas, main="Ventas mensuales diferenciadas. PACF", lag.max=20)
+# se observa en los acf y pacf que la serie diferenciada es estacionaria ###
+#### Estimamos un arima (1,1,0) de acuerdo a lo observado
+ARIMA110 <- arima(tsventas, order = c(1,1,0))
+print (ARIMA110)
+coeftest(ARIMA110)
+###Chequeo de los residuos###
+acf(ARIMA110$residuals, main=" ARIMA110. ACF", lag.max=20)
+pacf(ARIMA110$residuals, main="ARIMA110. PACF", lag.max=20)
+checkresiduals(ARIMA110)
+### utilizamos el autoarima### observar que se usa en nivel sin modificar la serie
+auto.arima(tsventas) 
+ARIMA011 <- arima(tsventas, order = c(0,1,1))
+print (ARIMA011)
+coeftest(ARIMA011)
+## test de autocorrelacion ho=no autocorrelacion, como estimamos un ma1 solo colocamos en fitdf un solo parametro
+Box.test(ARIMA011$residuals, type = "Ljung-Box", lag = 20, fitdf = 1)

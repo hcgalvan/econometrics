@@ -172,15 +172,15 @@ Dado que el modelo de tres instrumentos sugiere una posible endogeneidad y propo
 
 En conclusión:
 
--    Hemos replicado exitosamente el modelo IV utilizando regresiones OLS en dos etapas.
+-   Hemos replicado exitosamente el modelo IV utilizando regresiones OLS en dos etapas.
 
--    Los resultados son prácticamente idénticos a los obtenidos con `ivreg`, confirmando la validez de nuestro enfoque manual.
+-   Los resultados son prácticamente idénticos a los obtenidos con `ivreg`, confirmando la validez de nuestro enfoque manual.
 
--    La única diferencia notable está en los errores estándar, que son ligeramente subestimados en nuestro método manual.
+-   La única diferencia notable está en los errores estándar, que son ligeramente subestimados en nuestro método manual.
 
--    Tanto el método manual como `ivreg` muestran un efecto negativo y elástico del precio sobre la demanda de cigarrillos.
+-   Tanto el método manual como `ivreg` muestran un efecto negativo y elástico del precio sobre la demanda de cigarrillos.
 
--    La primera etapa confirma que `imptv` es un instrumento relevante, aunque su poder explicativo sobre `log(rprecio)` es modesto.
+-   La primera etapa confirma que `imptv` es un instrumento relevante, aunque su poder explicativo sobre `log(rprecio)` es modesto.
 
 Aunque ambos métodos son válidos, `ivreg` es preferible en la práctica porque corrige automáticamente los errores estándar y proporciona pruebas de diagnóstico útiles como Wu-Hausman.
 
