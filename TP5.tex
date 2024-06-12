@@ -1,0 +1,325 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={TP 5 - Data Panel},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{TP 5 - Data Panel}
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+\maketitle
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(haven)}
+\FunctionTok{library}\NormalTok{(plm)}
+\FunctionTok{library}\NormalTok{(dplyr)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'dplyr'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:plm':
+## 
+##     between, lag, lead
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data }\OtherTok{\textless{}{-}} \FunctionTok{read\_dta}\NormalTok{(}\StringTok{"D:/2024/econometria/pwt1001.dta"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Para aplicar un modelo con datos de panel, podemos utilizar la base de
+datos de Penn World Table (PWT). Esta base de datos contiene información
+sobre diferentes variables económicas de un amplio conjunto de países
+durante un período de tiempo considerable.
+
+Una pregunta teórica relevante que se puede abordar con estos datos es:
+¿Cómo afecta la apertura comercial al crecimiento económico de un país?
+
+Para responder a esta pregunta, podemos estimar un modelo de datos de
+panel que relacione el crecimiento del PIB per cápita (variable
+dependiente) con la apertura comercial (variable explicativa) y otras
+variables de control relevantes, como la inversión, el capital humano,
+etc.
+
+El modelo general tendría la siguiente forma:
+
+𝑙𝑜𝑔(𝑃𝐼𝐵𝑝𝑐)𝑖𝑡 = 𝛽0 + 𝛽1𝐴𝑝𝑒𝑟𝑡𝑢𝑟𝑎𝑖𝑡 + 𝛽2𝑋𝑖𝑡 + 𝛼𝑖 + 𝛾𝑡 + 𝜀𝑖𝑡
+
+Donde:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{𝑙𝑜𝑔(𝑃𝐼𝐵𝑝𝑐)𝑖𝑡} es el logaritmo del PIB per cápita del país
+  \texttt{i} en el año \texttt{t}.
+\item
+  \texttt{𝐴𝑝𝑒𝑟𝑡𝑢𝑟𝑎𝑖𝑡} es una medida de apertura comercial (por ejemplo,
+  la suma de exportaciones e importaciones como porcentaje del PIB).
+\item
+  \texttt{𝑋𝑖𝑡} es un vector de variables de control.
+\item
+  \texttt{𝛼𝑖} son los efectos fijos por país (invariantes en el tiempo).
+\item
+  \texttt{𝛾𝑡} son los efectos fijos por año (invariantes entre países).
+\item
+  \texttt{𝜀𝑖𝑡} es el término de error.
+\end{itemize}
+
+Aquí, \texttt{𝛽1} es el coeficiente de interés, que captura el efecto de
+la apertura comercial sobre el crecimiento económico.
+
+Para estimar este modelo, podemos utilizar técnicas estándar de datos de
+panel, como efectos fijos o efectos aleatorios, según corresponda.
+
+Aquí, \texttt{openk} es la variable de apertura comercial,
+\texttt{inv\_share} es la participación de la inversión en el PIB, y
+\texttt{hc} es una medida de capital humano. El argumento
+\texttt{model\ =\ "within"} especifica que estamos estimando un modelo
+de efectos fijos.
+
+La salida del modelo nos proporcionará los coeficientes estimados, así
+como su significancia estadística, lo que nos permitirá evaluar el
+efecto de la apertura comercial sobre el crecimiento económico.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# la inversión está representada por la variable csh\_i, que corresponde a la participación de la inversión en el PIB a precios constantes. Por lo tanto, no necesitamos realizar cálculos adicionales. Renombrar la variable:}
+
+\NormalTok{data }\OtherTok{\textless{}{-}}\NormalTok{ data }\SpecialCharTok{\%\textgreater{}\%}
+\NormalTok{  dplyr}\SpecialCharTok{::}\FunctionTok{rename}\NormalTok{(}\AttributeTok{inv\_share =}\NormalTok{ csh\_i)}
+
+\CommentTok{\#la apertura comercial "openk" se puede calcular como la suma de las exportaciones e importaciones como porcentaje del PIB}
+\NormalTok{data }\OtherTok{\textless{}{-}}\NormalTok{ data }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{mutate}\NormalTok{(}\AttributeTok{openk =}\NormalTok{ csh\_x }\SpecialCharTok{+}\NormalTok{ csh\_m) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Estimar el modelo de efectos fijos}
+\NormalTok{model }\OtherTok{\textless{}{-}} \FunctionTok{plm}\NormalTok{(}\FunctionTok{log}\NormalTok{(rgdpna) }\SpecialCharTok{\textasciitilde{}}\NormalTok{ openk }\SpecialCharTok{+}\NormalTok{ inv\_share }\SpecialCharTok{+}\NormalTok{ hc, }\AttributeTok{data =}\NormalTok{ data, }
+             \AttributeTok{index =} \FunctionTok{c}\NormalTok{(}\StringTok{"country"}\NormalTok{, }\StringTok{"year"}\NormalTok{), }\AttributeTok{model =} \StringTok{"within"}\NormalTok{)}
+\FunctionTok{summary}\NormalTok{(model)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Oneway (individual) effect Within Model
+## 
+## Call:
+## plm(formula = log(rgdpna) ~ openk + inv_share + hc, data = data, 
+##     model = "within", index = c("country", "year"))
+## 
+## Unbalanced Panel: n = 145, T = 30-70, N = 8637
+## 
+## Residuals:
+##      Min.   1st Qu.    Median   3rd Qu.      Max. 
+## -1.921987 -0.175057  0.017554  0.197574  1.663320 
+## 
+## Coefficients:
+##           Estimate Std. Error t-value  Pr(>|t|)    
+## openk     0.384717   0.020683  18.601 < 2.2e-16 ***
+## inv_share 1.567081   0.054579  28.712 < 2.2e-16 ***
+## hc        1.730666   0.010057 172.087 < 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Total Sum of Squares:    4797
+## Residual Sum of Squares: 1005.7
+## R-Squared:      0.79034
+## Adj. R-Squared: 0.78671
+## F-statistic: 10666.8 on 3 and 8489 DF, p-value: < 2.22e-16
+\end{verbatim}
+
+.Interpretación
+
+De acuerdo con la salida proporcionada, puedo interpretar los resultados
+del modelo de la siguiente manera:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Coeficientes estimados}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{openk} (apertura comercial): El coeficiente estimado es
+    0.384717, lo que indica que un aumento de 1 punto porcentual en la
+    apertura comercial (medida como la suma de exportaciones e
+    importaciones como porcentaje del PIB) está asociado con un aumento
+    del 0.384717\% en el PIB per cápita, manteniendo todo lo demás
+    constante. Este coeficiente es estadísticamente significativo
+    (p-valor \textless{} 2.2e-16).
+  \item
+    \texttt{inv\_share} (participación de la inversión en el PIB): El
+    coeficiente estimado es 1.567081, lo que implica que un aumento de 1
+    punto porcentual en la participación de la inversión en el PIB está
+    asociado con un aumento del 1.567081\% en el PIB per cápita,
+    manteniendo todo lo demás constante. Este coeficiente también es
+    estadísticamente significativo (p-valor \textless{} 2.2e-16).
+  \item
+    \texttt{hc} (capital humano): El coeficiente estimado es 1.730666,
+    lo que sugiere que un aumento de 1 unidad en la medida de capital
+    humano está asociado con un aumento del 1.730666\% en el PIB per
+    cápita, manteniendo todo lo demás constante. Este coeficiente es
+    estadísticamente significativo (p-valor \textless{} 2.2e-16).
+  \end{itemize}
+\item
+  \textbf{Significancia estadística}: Todos los coeficientes son
+  altamente significativos, con p-valores inferiores a 2.2e-16.
+\item
+  \textbf{Bondad de ajuste}: El modelo tiene un R-cuadrado de 0.79034,
+  lo que indica que el 79.034\% de la variación en el PIB per cápita es
+  explicada por las variables independientes (apertura comercial,
+  participación de la inversión y capital humano).
+\item
+  \textbf{Prueba F}: El estadístico F es 10666.8 con un p-valor inferior
+  a 2.22e-16, lo que sugiere que al menos uno de los coeficientes del
+  modelo es diferente de cero y que el modelo es estadísticamente
+  significativo.
+\end{enumerate}
+
+En general, los resultados sugieren que la apertura comercial, la
+participación de la inversión y el capital humano tienen un impacto
+positivo y estadísticamente significativo en el crecimiento del PIB per
+cápita. Estos hallazgos son consistentes con la teoría económica y
+respaldan la hipótesis de que una mayor apertura comercial está asociada
+con un mayor crecimiento económico.
+
+Es importante tener en cuenta que esta interpretación se basa únicamente
+en los coeficientes estimados y su significancia estadística. Para una
+interpretación más completa, también sería necesario evaluar las pruebas
+de diagnóstico y los supuestos del modelo, como la ausencia de
+autocorrelación y heterocedasticidad.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Prueba de Wooldridge}
+\end{Highlighting}
+\end{Shaded}
+
+
+\end{document}

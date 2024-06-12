@@ -1,0 +1,112 @@
+---
+title: "TP 5 - Data Panel"
+output:
+  html_notebook: default
+  pdf_document: default
+---
+
+**¿ Cuál es la principal utilidad de los modelos de datos en Panel? ¿ existe alguna diferencia entre aplicar efectos fijos o aleatorios en los modelos? Explique detalladamente los principales problemas que enfrentan estos tipos de modelos.**
+
+Los modelos de datos en Panel tienen como principal utilidad el análisis de datos de panel, los cuales combinan datos de corte transversal (es decir, datos recopilados en un mismo período de tiempo para diferentes individuos, empresas, países, etc.) con datos de series de tiempo (datos recopilados a lo largo del tiempo para los mismos individuos).
+
+La elección entre utilizar efectos fijos o aleatorios en los modelos de datos de panel depende principalmente de las suposiciones que se hagan sobre la relación entre los efectos no observados y las variables explicativas.
+
+**Efectos fijos:** - Suponen que las variables no observadas están correlacionadas con las variables explicativas. - Permiten controlar por heterogeneidad no observada constante en el tiempo. - Útiles cuando se está analizando un conjunto específico de individuos y se desea inferir los efectos para esos individuos en particular.
+
+**Efectos aleatorios:** - Suponen que las variables no observadas no están correlacionadas con las variables explicativas. - Permiten estimar los efectos de variables que varían a través del tiempo y entre individuos. - Útiles cuando se desea inferir los efectos para una población más amplia de la cual la muestra es representativa.
+
+Algunos de los principales problemas que enfrentan estos tipos de modelos son:
+
+1.  **Endogeneidad**: Puede haber variables omitidas, errores de medición o causalidad inversa que generen correlación entre las variables explicativas y el término de error, lo cual viola los supuestos del modelo y produce estimadores sesgados e inconsistentes.
+
+2.  **Heterocedasticidad**: La varianza del término de error puede no ser constante a través de las observaciones, lo que viola uno de los supuestos del modelo y puede producir estimadores ineficientes.
+
+3.  **Autocorrelación**: Los errores pueden estar correlacionados a través del tiempo para un mismo individuo, lo que también viola los supuestos del modelo y puede producir estimadores ineficientes.
+
+4.  **Multicolinealidad**: Puede haber alta correlación entre algunas variables explicativas, lo que dificulta la estimación precisa de los coeficientes individuales.
+
+5.  **Datos faltantes:** Es común que haya observaciones faltantes en los datos de panel, lo que puede generar sesgos si no se maneja adecuadamente.
+
+6.  **Selección de la muestra:** Si la muestra no es aleatoria, puede haber sesgos de selección que afecten la validez de las inferencias.
+
+Para abordar estos problemas, se utilizan técnicas como el uso de variables instrumentales, correcciones de errores estándar robustos, pruebas de especificación, métodos de imputación de datos faltantes, entre otros.
+
+#### Busque una base de datos que le permita aplicar algún modelo con datos de panel. Plantee una pregunta teórica que le permita responder con el modelo que plantea y luego estima.
+
+```{r}
+library(haven)
+library(plm)
+library(dplyr)
+
+data <- read_dta("D:/2024/econometria/pwt1001.dta")
+```
+
+Para aplicar un modelo con datos de panel, podemos utilizar la base de datos de Penn World Table (PWT). Esta base de datos contiene información sobre diferentes variables económicas de un amplio conjunto de países durante un período de tiempo considerable.
+
+Una pregunta teórica relevante que se puede abordar con estos datos es: ¿Cómo afecta la apertura comercial al crecimiento económico de un país?
+
+Para responder a esta pregunta, podemos estimar un modelo de datos de panel que relacione el crecimiento del PIB per cápita (variable dependiente) con la apertura comercial (variable explicativa) y otras variables de control relevantes, como la inversión, el capital humano, etc.
+
+Fuente datos: <https://www.rug.nl/ggdc/productivity/pwt/>
+
+El modelo general tendría la siguiente forma:
+
+𝑙𝑜𝑔(𝑃𝐼𝐵𝑝𝑐)𝑖𝑡 = 𝛽0 + 𝛽1𝐴𝑝𝑒𝑟𝑡𝑢𝑟𝑎𝑖𝑡 + 𝛽2𝑋𝑖𝑡 + 𝛼𝑖 + 𝛾𝑡 + 𝜀𝑖𝑡
+
+Donde:
+
+-   `𝑙𝑜𝑔(𝑃𝐼𝐵𝑝𝑐)𝑖𝑡` es el logaritmo del PIB per cápita del país `i` en el año `t`.
+-   `𝐴𝑝𝑒𝑟𝑡𝑢𝑟𝑎𝑖𝑡` es una medida de apertura comercial (por ejemplo, la suma de exportaciones e importaciones como porcentaje del PIB).
+-   `𝑋𝑖𝑡` es un vector de variables de control.
+-   `𝛼𝑖` son los efectos fijos por país (invariantes en el tiempo).
+-   `𝛾𝑡` son los efectos fijos por año (invariantes entre países).
+-   `𝜀𝑖𝑡` es el término de error.
+
+Aquí, `𝛽1` es el coeficiente de interés, que captura el efecto de la apertura comercial sobre el crecimiento económico.
+
+Para estimar este modelo, podemos utilizar técnicas estándar de datos de panel, como efectos fijos o efectos aleatorios, según corresponda.
+
+Aquí, `openk` es la variable de apertura comercial, `inv_share` es la participación de la inversión en el PIB, y `hc` es una medida de capital humano. El argumento `model = "within"` especifica que estamos estimando un modelo de efectos fijos.
+
+El argumento `index` indica cómo se identifica cada observación en términos de su individuo y período de tiempo. Específicamente, index es un vector de dos elementos que contiene los nombres de las columnas (o factores) que identifican a los individuos y a los períodos de tiempo.
+
+La salida del modelo nos proporcionará los coeficientes estimados, así como su significancia estadística, lo que nos permitirá evaluar el efecto de la apertura comercial sobre el crecimiento económico.
+
+```{r}
+# la inversión está representada por la variable csh_i, que corresponde a la participación de la inversión en el PIB a precios constantes. Por lo tanto, no necesitamos realizar cálculos adicionales. Renombrar la variable:
+
+data <- data %>%
+  dplyr::rename(inv_share = csh_i)
+
+#la apertura comercial "openk" se puede calcular como la suma de las exportaciones e importaciones como porcentaje del PIB
+data <- data %>%
+  mutate(openk = csh_x + csh_m) 
+```
+
+```{r}
+# Estimar el modelo de efectos fijos
+model <- plm(log(rgdpna) ~ openk + inv_share + hc, data = data, 
+             index = c("country", "year"), model = "within")
+
+summary(model)
+```
+
+.Interpretación
+
+De acuerdo con la salida proporcionada, puedo interpretar los resultados del modelo de la siguiente manera:
+
+1.  **Coeficientes estimados**:
+
+    -   `openk` (apertura comercial): El coeficiente estimado es 0.384717, lo que indica que un aumento de 1 punto porcentual en la apertura comercial (medida como la suma de exportaciones e importaciones como porcentaje del PIB) está asociado con un aumento del 0.384717% en el PIB per cápita, manteniendo todo lo demás constante. Este coeficiente es estadísticamente significativo (p-valor \< 2.2e-16).
+    -   `inv_share` (participación de la inversión en el PIB): El coeficiente estimado es 1.567081, lo que implica que un aumento de 1 punto porcentual en la participación de la inversión en el PIB está asociado con un aumento del 1.567081% en el PIB per cápita, manteniendo todo lo demás constante. Este coeficiente también es estadísticamente significativo (p-valor \< 2.2e-16).
+    -   `hc` (capital humano): El coeficiente estimado es 1.730666, lo que sugiere que un aumento de 1 unidad en la medida de capital humano está asociado con un aumento del 1.730666% en el PIB per cápita, manteniendo todo lo demás constante. Este coeficiente es estadísticamente significativo (p-valor \< 2.2e-16).
+
+2.  **Significancia estadística**: Todos los coeficientes son altamente significativos, con p-valores inferiores a 2.2e-16.
+
+3.  **Bondad de ajuste**: El modelo tiene un R-cuadrado de 0.79034, lo que indica que el 79.034% de la variación en el PIB per cápita es explicada por las variables independientes (apertura comercial, participación de la inversión y capital humano).
+
+4.  **Prueba F**: El estadístico F es 10666.8 con un p-valor inferior a 2.22e-16, lo que sugiere que al menos uno de los coeficientes del modelo es diferente de cero y que el modelo es estadísticamente significativo.
+
+En general, los resultados sugieren que la apertura comercial, la participación de la inversión y el capital humano tienen un impacto positivo y estadísticamente significativo en el crecimiento del PIB per cápita. Estos hallazgos son consistentes con la teoría económica y respaldan la hipótesis de que una mayor apertura comercial está asociada con un mayor crecimiento económico.
+
+Es importante tener en cuenta que esta interpretación se basa únicamente en los coeficientes estimados y su significancia estadística. Para una interpretación más completa, también sería necesario evaluar las pruebas de diagnóstico y los supuestos del modelo, como la ausencia de autocorrelación y heterocedasticidad.
